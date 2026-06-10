@@ -1,11 +1,10 @@
 bin/
+.env
 docs/.gen/
 
 .idea/*
 */__debug_*
-# local-env*
 *logs*
 *__debug_bin*
 .vscode
-cmd/mashhad/club/logs/
 .cursor
