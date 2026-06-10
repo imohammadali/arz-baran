@@ -1,0 +1,22 @@
+@if ((language$|async)=="en") {
+  <p-calendar
+    [showIcon]='true'
+    [showButtonBar]='true'
+    clearButtonStyleClass='btn btn-outline-secondary'
+    todayButtonStyleClass='btn btn-outline-secondary'
+    [showTime]='true'
+    [showSeconds]='true'
+    appendTo='body'
+  dateFormat='yy/mm/dd' (ngModelChange)='updatedDate(moment($event).unix())' [(ngModel)]='val_en'></p-calendar>
+} @else {
+  <prime-calendar
+    [showIcon]='true'
+    [showButtonBar]='true'
+    clearButtonStyleClass='btn btn-outline-secondary'
+    todayButtonStyleClass='btn btn-outline-secondary'
+    [showTime]='true'
+    [showSeconds]='true'
+    appendTo='body'
+  dateFormat='yy/mm/dd' (ngModelChange)='updatedDate($event?.unix())' [(ngModel)]='val_fa'></prime-calendar>
+}
+<label [translate]='label'></label>

@@ -1,0 +1,7 @@
+@import 'elements/list-box';
+@import 'elements/loading';
+
+@mixin primeng-component-style() {
+  @include list-box();
+  @include loading();
+}

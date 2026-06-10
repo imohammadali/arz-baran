@@ -1,0 +1,59 @@
+.auth-bg {
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: cover;
+}
+
+::ng-deep {
+  p-card {
+    .p-card {
+      margin: 1rem 0;
+      &-body {
+        //padding: 0 !important;
+      }
+      &-content {
+        padding: 0 !important;
+        .options {
+          display: flex;
+          align-items: center;
+          .change-lang-input {
+            background-color: var(--main-contrast-color);
+          }
+          .change-theme-input {
+            padding: 0.45rem 0.9rem;
+            background-color: var(--main-contrast-color);
+            cursor: pointer;
+            border-radius: 0.6rem;
+            border: 1px solid var(--other-outline_border-color);
+            .pi {
+              color: var(--text-primary-light-mode);
+              font-size: 1rem;
+              font-weight: var(--button_medium-font-weight);
+              line-height: var(--button_medium-font-height);
+            }
+          }
+          &.is-dark {
+            .change-theme-input {
+              background-color: var(--main-secondary-color);
+              .pi {
+                color: var(--text-primary-dark-mode);
+              }
+            }
+            .change-lang-input {
+              background-color: var(--main-secondary-color);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+.h-100 {
+  height: 100vh;
+  overflow-y: auto;
+}

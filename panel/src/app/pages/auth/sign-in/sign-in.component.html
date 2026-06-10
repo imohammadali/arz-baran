@@ -1,0 +1,180 @@
+<div class="flex lg:hidden flex-col justify-between sing-in-sm h-screen">
+  <div class="flex flex-col justify-between lg:items-center p-3 h-[50vh] lg:h-[80vh]">
+    @if (selectedBranch$ | async; as selectedBranch) {
+      <div class="flex justify-between items-center lg:w-[85%]">
+        <div class="">
+          <p-selectButton [unselectable]="true" [ngModel]="language$ | async" [options]="stateOptions" [autofocus]="false" (onChange)="changeLanguage($event)" />
+        </div>
+        <div class="">
+          <p-button [rounded]="true" type="button" text plain (click)="showSelectBranch = true" aria-label="Select branch" aria-haspopup="dialog" [attr.aria-expanded]="showSelectBranch">
+            <span class="text-base-200 font-medium">{{ selectedBranch.name }}</span>
+            <i pButtonIcon class="icon icon-location-outline text-base-200 text-2xl"></i>
+          </p-button>
+        </div>
+      </div>
+    }
+    @if (selectedBranchModel?.logo) {
+      <div class="flex justify-center">
+        <img [src]="selectedBranchModel?.logo" [alt]="selectedBranchModel?.name + ' logo'" />
+        <!--      <span class="text-3xl font-bold text-white">{{ 'auth.club' | translate }}</span>-->
+      </div>
+    }
+  </div>
+
+  <div class="fixed bottom-0 bg-base-100 rounded-t-2xl w-full right-0 px-12 left-0 h-[27vh]">
+    <p-button [fluid]="true" styleClass="mt-[5vh]" (click)="onEnterPhone()">
+      {{ 'auth.login' | translate }}
+    </p-button>
+    <div class="text-xs flex items-center justify-center gap-[2px]">
+      <span>{{ 'auth.your_agreement' | translate }}</span>
+      <p-button severity="info" variant="text" styleClass="!px-0" size="small" (click)="showRules = true">{{ 'auth.terms' | translate }}</p-button>
+      <span>{{ 'auth.is' | translate }}</span>
+    </div>
+  </div>
+</div>
+<div class="hidden lg:flex h-screen justify-center items-center">
+  <div class="flex rounded-lg shadow-lg overflow-hidden">
+    <div class="flex flex-col gap-20 p-16 bg-base-200">
+      <div class="flex items-center justify-between pt-6 pb-4">
+        <div class="">
+          <p-selectButton [unselectable]="true" [ngModel]="language$ | async" [options]="stateOptions" [autofocus]="false" (onChange)="changeLanguage($event)" />
+        </div>
+        <p-button type="button" severity="secondary" [rounded]="true" (click)="showSelectBranch = true" aria-label="Select branch" aria-haspopup="dialog" [attr.aria-expanded]="showSelectBranch">
+          @if (selectedBranch$ | async; as selectedBranch) {
+            <span class="text-primary font-medium">
+              {{ selectedBranch.name }}
+            </span>
+          }
+          <span class="">
+            <i class="icon icon-location-outline text-primary"></i>
+          </span>
+        </p-button>
+      </div>
+      <div class="flex flex-col gap-10">
+        <h1 class="text-primary font-medium text-xl">
+          {{ 'auth.welcome' | translate }}
+        </h1>
+        <p-button severity="primary" [fluid]="true" (click)="onEnterPhone()">
+          {{ 'auth.login' | translate }}
+        </p-button>
+      </div>
+      <div class="text-base justify-center flex items-center gap-[2px]">
+        <span>{{ 'auth.your_agreement' | translate }}</span>
+        <p-button severity="info" variant="text" styleClass="!px-0" size="small" (click)="showRules = true">{{ 'auth.terms' | translate }}</p-button>
+        <span>{{ 'auth.is' | translate }}</span>
+      </div>
+    </div>
+    <div class="flex flex-col min-w-[500px] items-center justify-center sing-in-lg">
+      @if (selectedBranchModel?.logo) {
+        <div class="">
+          <!--        <span class="text-3xl font-bold text-white">{{ 'auth.club' | translate }}</span>-->
+          <img [src]="selectedBranchModel?.logo" [alt]="selectedBranchModel?.name + ' logo'" />
+        </div>
+      }
+    </div>
+  </div>
+</div>
+<app-drawer [(isOpen)]="showSelectBranch">
+  <div class="flex flex-col gap-12">
+    <div class="flex w-full justify-center">
+      <h3 class="font-semibold lg:text-2xl">
+        {{ 'auth.select_branch' | translate }}
+      </h3>
+    </div>
+    <div class="flex flex-col gap-4">
+      <span class="lg:text-lg">{{ 'auth.select_branch_subtitle' | translate }}</span>
+      <div class="flex flex-col gap-3">
+        @for (branch of branches; track branch) {
+          <div class="flex items-center cursor-pointer">
+            <p-radioButton name="branch" [(ngModel)]="selectedBranchModel" [value]="branch" [inputId]="branch.key" />
+            <label [for]="branch.key" class="mx-2">{{ branch.name }}</label>
+          </div>
+        }
+      </div>
+    </div>
+    <p-button [fluid]="true" (click)="changeBranch()">
+      {{ 'auth.select' | translate }}
+    </p-button>
+  </div>
+</app-drawer>
+<app-drawer [(isOpen)]="showRules">
+  <div class="flex flex-col gap-4 overflow-y-scroll max-h-[50vh]">
+    <div class="flex justify-center lg:justify-start font-medium z-10 bg-base-100 py-3 lg:font-semibold lg:text-2xl text-xl text-nowrap sticky top-0">
+      {{ 'rules.title' | translate }}
+    </div>
+    @if (rules$ | async; as rules) {
+      <div class="pb-3">
+        @if (theme$ | async; as theme) {
+          @if (theme === 'dark-theme') {
+            <div class="" [innerHTML]="darkDescription"></div>
+          } @else {
+            <div class="" [innerHTML]="lightDescription"></div>
+          }
+        }
+      </div>
+    }
+  </div>
+</app-drawer>
+<app-drawer [(isOpen)]="showEnterPhone">
+  <form class="flex flex-col mt-[8vh] gap-6 px-3" [formGroup]="phoneFormGroup" (ngSubmit)="submitPhone()">
+    <div class="flex justify-center">
+      <span class="text-sm" translate="auth.enterPhone"></span>
+    </div>
+    <div class="">
+      <div class="field p-float-label">
+        <p-floatlabel variant="on">
+          <input pInputText id="mobile" dir="ltr" [fluid]="true" aria-describedby="mobile-errors" formControlName="mobile" class="font-numFa" />
+          <label translate="auth.phone" for="mobile"></label>
+        </p-floatlabel>
+      </div>
+      <div class="" id="mobile-errors">
+        @if (phoneFormGroup.get('mobile').hasError('required') && submittedPhone) {
+          <p-message role="alert" aria-live="assertive" severity="error" [text]="'feedback.required' | translate"></p-message>
+        }
+        @if (phoneFormGroup.get('mobile').hasError('pattern') && submittedPhone) {
+          <p-message role="alert" aria-live="assertive" severity="error" [text]="'feedback.pattern' | translate"></p-message>
+        }
+        @if (phoneFormGroup.get('mobile').hasError('minlength') && submittedPhone) {
+          <p-message role="alert" aria-live="assertive" severity="error" [text]="'feedback.minLength' | translate: { length: 10 }"></p-message>
+        }
+      </div>
+    </div>
+    <p-button [loading]="loadingSubmitPhone" [fluid]="true" [disabled]="loadingSubmitPhone || phoneFormGroup.invalid" type="submit" severity="primary" class="w-full">{{ 'auth.getCode' | translate }}</p-button>
+  </form>
+</app-drawer>
+<app-drawer [(isOpen)]="showEnterOtp">
+  <form class="flex flex-col mt-[8vh] gap-6 px-3" [formGroup]="otpFormGroup" (ngSubmit)="submitOtp()">
+    <div class="flex flex-col">
+      <span class="font-numFa">{{ 'auth.codeSent' | translate: { mobile: phoneFormGroup.get('mobile').value } }}</span>
+    </div>
+    <div class="flex flex-col gap-4">
+      <p-inputOtp style="direction: ltr" [integerOnly]="true" styleClass="w-full" formControlName="code" [length]="6" (keydown.enter)="submitOtp()" />
+      @if (otpFormGroup.get('code').hasError('required') && submittedOtp) {
+        <p-message role="alert" aria-live="assertive" severity="error" [text]="'feedback.required' | translate"></p-message>
+      }
+      @if (otpFormGroup.get('code').hasError('minlength') && submittedOtp) {
+        <p-message role="alert" aria-live="assertive" severity="error" [text]="'feedback.minLength' | translate: { length: 6 }"></p-message>
+      }
+    </div>
+    <div class="flex items-center justify-between cursor-pointer" (click)="editPhone()">
+      <span class="" translate="auth.wrongPhone"></span>
+      <span class="text-primary" translate="auth.edit"></span>
+    </div>
+    @if ((toExpireOTP | async) !== 0) {
+      <p-button [loading]="loadingSubmitOtp" [fluid]="true" [disabled]="loadingSubmitOtp || otpFormGroup.invalid" type="submit" severity="primary" class="w-full">{{ 'auth.confirm_login' | translate }}</p-button>
+    }
+    @if (toExpireOTP | async) {
+      <div class="flex justify-center gap-2">
+        <span class="font-numFa">
+          <span class="min-w-12 inline-block">{{ moment.utc((toExpireOTP | async) * 1000).format('mm:ss') }}</span> {{ 'auth.second' | translate }}</span
+        >
+        <p translate="auth.timeRemaining"></p>
+      </div>
+    }
+    @if ((toExpireOTP | async) === 0) {
+      <div class="w-full">
+        <p-button type="button" (click)="submitPhone()" [fluid]="true" severity="primary" variant="outlined" class="w-full">{{ 'auth.resendCode' | translate }}</p-button>
+      </div>
+    }
+  </form>
+</app-drawer>

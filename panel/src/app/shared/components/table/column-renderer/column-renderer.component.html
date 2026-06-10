@@ -1,0 +1,53 @@
+@if ((loading$|async) === false && !(inProgressApis$|async).includes(setting.tableName+':tr:'+index)) {
+  @switch (column?.renderer) {
+    @case ('boolean') {
+      <boolean-renderer [data]="data[column.field]"></boolean-renderer>
+    }
+    @case ('text_color') {
+      <text-color-renderer [data]="data" [col]="column"></text-color-renderer>
+    }
+    @case ('button') {
+      <button-renderer [col]="column" [data]="data" [setting]="setting"></button-renderer>
+    }
+    @case ('date') {
+      <date-renderer [data]="data" [col]="column"></date-renderer>
+    }
+    @case ('dropdown') {
+      <dropdown-renderer [data]="data" [col]="column" [setting]="setting" [index]="index"></dropdown-renderer>
+    }
+    @case ('tag') {
+      <tag-renderer [data]="data" [col]="column"></tag-renderer>
+    }
+    @case ('icon') {
+      <icon-renderer [data]="data" [col]="column" [setting]="setting" [index]="index"></icon-renderer>
+    }
+    @case ('color_code') {
+      <color-code-renderer [data]="data" [col]="column" [setting]="setting" [index]="index"></color-code-renderer>
+    }
+    @case ('toggle') {
+      <toggle-renderer [data]="data" [col]="column" [setting]="setting" [index]="index"></toggle-renderer>
+    }
+    @case ('action_button') {
+      <action-button-renderer [data]="data" [col]="column" [setting]="setting" [index]="index"></action-button-renderer>
+    }
+    @case ('link') {
+      <link-renderer [data]="data" [col]="column" [setting]="setting"></link-renderer>
+    }
+    @case ('thumbnail') {
+      <thumbnail-renderer [data]="data[column.field]"></thumbnail-renderer>
+    }
+    @case ('related_question') {
+      <related-question-renderer [col]="column" [data]="data" [index]="index" [setting]="setting"></related-question-renderer>
+    }
+    @case ('extra-link') {
+      <icon-renderer [data]="data" [col]="column" [setting]="setting"></icon-renderer>
+    }
+    @default {
+      <span [style]="column.renderer_option?.style||''" class="column-default {{column.renderer_option?.class||''}}" [pTooltip]="data[column.field]?.toString() ? data[column.field] : '-'" tooltipPosition="top">
+        {{data[column.field]?.toString() ? (data[column.field] | summery : column?.renderer_option?.max_char) : '-'}}
+      </span>
+    }
+  }
+} @else {
+  <p-skeleton height="2rem"></p-skeleton>
+}

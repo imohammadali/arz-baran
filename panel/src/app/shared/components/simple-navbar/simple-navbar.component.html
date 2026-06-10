@@ -1,0 +1,68 @@
+<nav class="hidden fixed top-0 right-0 left-0 z-[99] lg:flex lg:justify-center bg-base-200 shadow-md p-3 lg:px-0 lg:py-5">
+  <div class="lg:max-w-[90vw] xl:max-w-[80vw] lg:min-w-[90vw] xl:min-w-[80vw] 2xl:min-w-[70vw] 2xl:max-w-[70vw] flex justify-between">
+    <div class="lg:flex items-center gap-3 hidden cursor-pointer" routerLink="/home">
+      @if ((theme$ | async) !== 'dark-theme') {
+        <span class="font-medium text-2xl text-primary">{{ 'home.club' | translate }}</span>
+      }
+      @if ((theme$ | async) === 'dark-theme') {
+        <span class="font-medium text-2xl text-white">{{ 'home.club' | translate }}</span>
+      }
+    </div>
+    <div class="hidden lg:flex items-center gap-5">
+      @if (selectedBranch$ | async; as selectedBranch) {
+        <p-button (click)="showSelectBranchLg = true" severity="primary" variant="outlined" class="flex items-center justify-center rounded-lg px-6 py-3 gap-5">
+          <i class="icon icon-location-fill"></i>
+          <span class="font-medium"> {{ selectedBranch.name }} </span>
+        </p-button>
+      }
+      <div routerLink="/notifications" class="hidden lg:flex cursor-pointer">
+        @if (!(isNotificationUnread$ | async)) {
+          <i class="icon icon-notif text-primary lg:text-4xl flex justify-center"></i>
+        }
+        @if (isNotificationUnread$ | async) {
+          <i class="icon icon-notif text-primary lg:text-4xl flex justify-center" pBadge severity="danger"></i>
+        }
+      </div>
+      <div class="hidden lg:flex cursor-pointer" routerLink="/settings">
+        <i class="icon icon-wallet-outline text-primary lg:text-4xl"></i>
+      </div>
+      <!--        <img src="img/qrcode.png" alt="">-->
+    </div>
+  </div>
+</nav>
+<div class="lg:hidden fixed top-0 right-0 left-0 z-[99] grid grid-cols-3 bg-base-200 lg:grid-cols-2 py-2 items-center shadow-md w-full px-3">
+  <div class="lg:hidden cursor-pointer flex" (click)="goBack()">
+    <i class="icon icon-arrow-right text-4xl" [ngClass]="{ 'rotate-180': (language$ | async) === 'en' }"></i>
+  </div>
+  <div class="flex justify-center items-center gap-2 lg:justify-start font-medium lg:font-semibold lg:text-2xl text-xl text-nowrap">
+    {{ pageTitle$ | async | translate }}
+  </div>
+  <div class="flex justify-end">
+    <p-button routerLink="/home" severity="primary" variant="outlined" class="lg:flex hidden">
+      {{ 'navbar.back' | translate }}
+    </p-button>
+  </div>
+</div>
+<p-dialog maskStyleClass="backdrop-blur-sm" [modal]="true" [dismissableMask]="true" [(visible)]="showSelectBranchLg" [style]="{ width: '25rem' }">
+  <div class="flex flex-col gap-12">
+    <div class="flex w-full justify-center">
+      <h3 class="font-semibold lg:text-2xl">
+        {{ 'auth.select_branch' | translate }}
+      </h3>
+    </div>
+    <div class="flex flex-col gap-4">
+      <span class="lg:text-lg">{{ 'auth.select_branch_subtitle' | translate }}</span>
+      <div class="flex flex-col gap-3">
+        @for (branch of branches$ | async; track branch) {
+          <div class="flex items-center">
+            <p-radioButton name="branch" [(ngModel)]="selectedBranchModel" [value]="branch" [inputId]="branch.key" />
+            <label [for]="branch.key" class="mx-2">{{ branch.name }}</label>
+          </div>
+        }
+      </div>
+    </div>
+    <p-button [fluid]="true" severity="primary" (click)="changeBranch()">
+      {{ 'auth.select' | translate }}
+    </p-button>
+  </div>
+</p-dialog>

@@ -1,0 +1,195 @@
+<p-table #dt [lazy]="lazyFlag" (onLazyLoad)="onFilters($event)" (onRowReorder)="onRowReorder($event?.dragIndex, $event?.dropIndex)" selectionMode="multiple" [dataKey]="(settingTable$ | async)?.setting?.dataKeyRow || 'id'" [(selection)]="selection" (selectionChange)="onSelectionChange($event)" (mouseleave)="rowHoverIndex = -1" (onHeaderCheckboxToggle)="onSelectedAll($event)" [value]="dataTable$ | async | MapDataTable: (settingTable$ | async)?.mapData || defaultMapData">
+  <ng-template #caption>
+    <div class="flex">
+      <div class="flex flex-col justify-end">
+        @if ([undefined, true].includes((settingTable$ | async).setting.globalFilter)) {
+          <p-floatlabel [variant]="'on'">
+            <input pInputText (input)="dt.filterGlobal($event.target?.['value'], 'contains')" [(ngModel)]="filterGlobal" />
+            <label translate="forms.search"></label>
+          </p-floatlabel>
+        }
+        <ng-content select=".meta"></ng-content>
+      </div>
+      <div class="grow flex flex-col gap-4">
+        <div class="flex justify-end gap-2">
+          @if ((settingTable$ | async)?.setting?.toggleColumns !== false || (settingTable$ | async)?.setting?.reOrderColumns !== false || (toggleFilter$ | async)) {
+            @if (toggleFilter$ | async) {
+              <p-button severity="info" [rounded]="true" [icon-name]="(showFilter$ | async) ? 'filter_alt' : 'filter_alt_off'" (click)="showFilter$.next(!showFilter$.value)" class="cursor-pointer mx-2"></p-button>
+            }
+            <p-button severity="info" [rounded]="true" icon-name="menu" class="cursor-pointer" (click)="toggleColumns.toggle($event)"></p-button>
+            <p-popover #toggleColumns appendTo="body">
+              @for (column of tableColumns$ | async; track column; let index = $index) {
+                <div class="flex items-center me-2 py-2" pDroppable (onDrop)="colReorderToIndex = index; onColReorder()">
+                  @if ((settingTable$ | async)?.setting?.reOrderColumns !== false) {
+                    <span icon-name="drag_indicator" style="cursor: move" dragEffect="move" pDraggable (onDrag)="colReorderFromIndex = index"></span>
+                  }
+                  @if ((settingTable$ | async)?.setting?.toggleColumns !== false) {
+                    <p-checkbox class="checkbox-solid" [binary]="true" [ngModel]="!column?.is_hidden" (click)="toggleColumn(column?.label, !column?.is_hidden)"></p-checkbox>
+                  }
+                  <label class="ms-2">{{ (column.label ? 'table.column.' + column.label : '') | translate }}</label>
+                </div>
+              }
+            </p-popover>
+          }
+        </div>
+        <div class="flex justify-end gap-2">
+          <ng-content select=".buttons"></ng-content>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template #header>
+    <tr class="filter-row" [class.hidden]="!(showFilter$ | async)">
+      <th></th>
+      @if ((settingTable$ | async)?.setting?.reorder && (dataTable$ | async)?.length) {
+        <th style="width: 4rem"></th>
+      }
+      @if ((settingTable$ | async)?.setting?.selection) {
+        <th style="width: 4rem"></th>
+      }
+      @for (column of (settingTable$ | async).columns; track column) {
+        @if (!column?.is_hidden) {
+          <th [pTooltip]="'forms.search_to' | translate: { field: ('table.column.' + column.label | translate) }">
+            @if (column.filter?.key) {
+              @switch (column.filter.type) {
+                @case ('text') {
+                  <span class="field block">
+                    <input pInputText (input)="dt.filter($event.target?.['value'], column.filter.key, 'contains')" [placeholder]="'forms.search_to' | translate: { field: ('table.column.' + column.label | translate) }" />
+                  </span>
+                }
+                @case ('dropdown') {
+                  <span class="field block">
+                    <p-select [showClear]="true" [filter]="true" appendTo="body" (onChange)="dt.filter($event?.['value']?.[column.filter.option.optionValue || 'id'], column.filter.key, 'contains')" [options]="column.filter.option.data | async" [optionLabel]="column.filter.option.optionLabel || 'name'" [showClear]="true"> </p-select>
+                  </span>
+                }
+                @case ('tree_select') {
+                  <span class="field block">
+                    <p-treeSelect [filter]="true" selectionMode="single" [metaKeySelection]="false" [showClear]="true" (onNodeSelect)="dt.filter($event.node, column.filter.key, 'contains')" (onClear)="dt.filter({}, column.filter.key, 'contains')" [options]="column.filter.option.data | async"> </p-treeSelect>
+                  </span>
+                }
+                @case ('boolean') {
+                  <span class="field block" [style]="{ 'text-align': column?.with === 0 ? 'center' : 'unset' }">
+                    <!--                <p-triStateCheckbox class='checkbox-solid' (onChange)="dt.filter($event?.['value'], column.filter.key, 'contains')"></p-triStateCheckbox>-->
+                  </span>
+                }
+                @case ('range_date') {
+                  <span class="field block" [style]="{ 'text-align': column?.with === 0 ? 'center' : 'unset' }">
+                    <div class="row">
+                      <div class="col-lg-6">
+                        <prime-calendar [placeholder]="'forms.from_date' | translate" appendTo="body" (onSelect)="dt.filter($event, column.filter.option.startKey, 'contains')"></prime-calendar>
+                      </div>
+                      <div class="col-lg-6">
+                        <prime-calendar [placeholder]="'forms.to_date' | translate" appendTo="body" (onSelect)="dt.filter($event, column.filter.option.endKey, 'contains')"></prime-calendar>
+                      </div>
+                    </div>
+                  </span>
+                }
+                @case ('date') {
+                  <span class="field block" [style]="{ 'text-align': column?.with === 0 ? 'center' : 'unset' }">
+                    <prime-calendar [placeholder]="'table.column.' + column.label | translate" appendTo="body" (onSelect)="dt.filter($event, column.filter.key, 'contains')"></prime-calendar>
+                  </span>
+                }
+              }
+            }
+          </th>
+        }
+      }
+    </tr>
+    @for (depth of [].constructor(depth_columns$ | async); track depth; let depth_i = $index) {
+      <tr>
+        @if (!depth_i) {
+          @if ((settingTable$ | async)?.setting?.reorder && (dataTable$ | async)?.length) {
+            <th style="width: 4rem" [rowSpan]="depth_columns$ | async"></th>
+          }
+          @if ((settingTable$ | async)?.setting?.selection) {
+            <th style="width: 4rem" [rowSpan]="depth_columns$ | async">
+              <p-tableHeaderCheckbox class="checkbox-solid"></p-tableHeaderCheckbox>
+            </th>
+          }
+          <th style="width: 1rem" [rowSpan]="depth_columns$ | async">#</th>
+        }
+        @for (column of getDepthColumns(depth_i) | async; track column) {
+          @if (!column?.is_hidden) {
+            <th [pSortableColumn]="column?.sort ? column.sort_key || column.field : null" [rowSpan]="column?.sub_columns?.length ? 1 : column?.sub_columns?.length" [colSpan]="column?.sub_columns?.length || 1">
+              <label [class.block]="column?.with === 0 && !column?.sort" [style.cursor]="column?.sort ? 'pointer' : 'auto'" [style]="{ 'text-align': column?.with === 0 ? 'center' : 'unset' }">
+                <span class="whitespace-nowrap">
+                  {{ (column.label ? 'table.column.' + column.label : '') | translate }}
+                </span>
+                @if (column?.sort) {
+                  @if ([column?.field, column?.sort_key].includes(filter?.sort?.field) && filter?.sort?.field) {
+                    @if (filter?.sort?.type === 1) {
+                      <i class="sort-icon pi pi-sort-amount-down-alt animate__animated animate__fadeInDown"></i>
+                    }
+                    @if (filter?.sort?.type === -1) {
+                      <i class="sort-icon pi pi-sort-amount-up-alt animate__animated animate__fadeInUp"></i>
+                    }
+                  } @else {
+                    <i class="sort-icon pi pi-sort-alt"></i>
+                  }
+                }
+              </label>
+            </th>
+          }
+        }
+      </tr>
+    }
+  </ng-template>
+  <ng-template #body let-data let-i="rowIndex">
+    <tr (mouseover)="rowIsHover(i)" [pReorderableRow]="i" [ngStyle]="{ cursor: (settingTable$ | async)?.setting?.clickableRow === false ? 'auto' : 'pointer' }">
+      @if ((loading$ | async) === false) {
+        @if ((settingTable$ | async).setting?.reorder && (dataTable$ | async)?.length) {
+          <td>
+            <span class="pi pi-bars" pReorderableRowHandle></span>
+          </td>
+        }
+        @if ((settingTable$ | async).setting?.selection) {
+          @if ((loading$ | async) === false) {
+            <td>
+              <p-tableCheckbox [value]="data" class="checkbox-solid"></p-tableCheckbox>
+            </td>
+          } @else {
+            <td>
+              <p-skeleton height="2rem"></p-skeleton>
+            </td>
+          }
+        }
+        <td>{{ countFirstRow + 1 + i }}</td>
+      } @else {
+        <td>
+          <p-skeleton height="2rem"></p-skeleton>
+        </td>
+      }
+      @for (depth of [].constructor(depth_columns$ | async); track depth; let depth_i = $index) {
+        @for (column of getDepthColumns(depth_i) | async; track column) {
+          @if (!column.is_hidden && !column?.sub_columns) {
+            <td
+              (click)="clickRow('click', column, data)"
+              [class.width-available]="column?.with !== 0"
+              [style]="{
+                'min-width': column?.with ? column.with.toString() + 'rem' : 'fit-content',
+                'width': column?.with === 0 ? 0 : null,
+                'text-align': column?.with === 0 ? 'center' : 'unset'
+              }"
+            >
+              <column-renderer [loading$]="loading$" [column]="column" [data]="data" [setting]="(settingTable$ | async)?.setting" [index]="i" [hoverIndex]="rowHoverIndex"></column-renderer>
+            </td>
+          }
+        }
+      }
+    </tr>
+  </ng-template>
+  <ng-template #loadingbody let-columns="columns">
+    <tr>
+      @for (depth of [].constructor(depth_columns$ | async); track depth; let depth_i = $index) {
+        @for (column of getDepthColumns(depth_i) | async; track column) {
+          <td><p-skeleton height="2rem"></p-skeleton></td>
+        }
+      }
+      <td><p-skeleton height="2rem"></p-skeleton></td>
+    </tr>
+  </ng-template>
+</p-table>
+@if ((settingTable$ | async)?.setting?.pagination) {
+  <p-paginator #paginator [showJumpToPageInput]="true" [showPageLinks]="true" [first]="countFirstRow" [alwaysShow]="false" appendTo="body" [showFirstLastIcon]="true" [totalRecords]="totalRecord((settingTable$ | async).setting.tableName) | async" [pageLinkSize]="5" [rows]="limit" [rowsPerPageOptions]="[5, 10, 50, 100, 500]" (onPageChange)="paginate($event)"> </p-paginator>
+}
+<ng-content select=".error-message"></ng-content>

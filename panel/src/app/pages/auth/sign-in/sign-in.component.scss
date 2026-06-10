@@ -1,0 +1,30 @@
+.icon-refresh {
+  font-size: 1.2rem;
+  padding: 0 0.6rem;
+  cursor: pointer;
+}
+
+.container-captcha {
+  background-color: var(--common-white);
+  cursor: pointer;
+  margin: 0 0.5rem;
+  border-radius: 0.2rem;
+}
+.sing-in-lg {
+  background: url('/img/sign-in-bg.png') no-repeat center center;
+}
+.sing-in-sm {
+  background: url('/img/sing-in-bg-sm.png') no-repeat center center;
+}
+::ng-deep .rules-content {
+  p,
+  em,
+  span {
+    color: inherit !important; // or remove !important if not needed
+  }
+
+  // Allow inline styles to work
+  [style] {
+    color: unset;
+  }
+}

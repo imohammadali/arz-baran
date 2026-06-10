@@ -1,0 +1,97 @@
+@import '../public/fonts/IRANYekanX/Webfonts/fontiran.css';
+@import '../public/fonts/IRANYekanX/farsi_numerals/Webfonts/fontiran.css';
+
+html[dir='rtl'] {
+  font-family: IRANYekanX, sans-serif;
+
+  .p-breadcrumb {
+    .p-breadcrumb-list {
+      .p-breadcrumb-separator {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  .material-symbols-outlined {
+    direction: rtl !important;
+  }
+
+  .pi-angle-right,
+  .pi-angle-left {
+    transform: rotate(180deg);
+  }
+
+  .highcharts {
+    &-menu-item {
+      direction: rtl !important;
+    }
+
+    &-title {
+      direction: rtl !important;
+    }
+  }
+
+  .ql-editor {
+    text-align: start !important;
+    direction: rtl !important;
+  }
+
+  .p-tieredmenu-submenu {
+    inset-inline-start: 100% !important;
+    left: unset !important;
+  }
+
+  .p-selectbutton .p-togglebutton {
+    border-width: 1px;
+    border-inline-start-width: 0;
+  }
+
+  .p-selectbutton p-togglebutton:first-child {
+    border-inline-start-width: 1px !important;
+  }
+
+  .p-divider-left:dir(rtl),
+  .p-divider-right:dir(rtl) {
+    flex-direction: row !important;
+  }
+
+  .p-datepicker-dropdown {
+    border-left: 1px solid var(--p-datepicker-dropdown-border-color);
+    border-inline-start: 0;
+  }
+
+  .p-overlay {
+    inset-inline-start: unset !important;
+  }
+
+  .custom-sidebar {
+    .p-drawer-close-button {
+      .p-button {
+        .pi-chevron-right {
+          transform: rotate(0deg) !important;
+        }
+
+        border-radius: 0 5px 5px 0px !important;
+      }
+    }
+  }
+
+  .toggle-map-menu {
+    border-radius: 0 5px 5px 0 !important;
+
+    .pi-chevron-left {
+      transform: rotate(180deg) !important;
+    }
+  }
+  .font-numFa {
+    font-family: IRANYekanXFaNum;
+  }
+  .apexcharts-legend {
+    &-marker {
+      margin: 0 0.3rem;
+    }
+    &-text {
+      font-family: IRANYekanX, serif !important;
+    }
+  }
+}

@@ -1,0 +1,93 @@
+@mixin sidebar() {
+  $color_1: #495057;
+  $color_2: #6c757d;
+  $color_3: #343a40;
+  $border-color_1: transparent;
+
+  .p-sidebar {
+    background: var(--other-paper_card-color);
+    color: var(--text-primary-color);
+    border: 0 none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    border-radius: 8px 8px 0 0;
+    height: fit-content;
+    width: 100%;
+    &.rounded-none {
+      border-radius: 0 !important;
+    }
+    .p-sidebar-header {
+      direction: ltr;
+      .p-sidebar-close {
+        width: 2rem;
+        height: 2rem;
+        color: var(--text-secondary-color);
+        border: 0 none;
+        background: transparent;
+        border-radius: 50%;
+        transition:
+          background-color 0.2s,
+          color 0.2s,
+          box-shadow 0.2s;
+        &:enabled {
+          &:hover {
+            color: $color_3;
+            border-color: $border-color_1;
+            background: #e9ecef;
+          }
+        }
+        &:focus {
+          outline: 0 none;
+          outline-offset: 0;
+          box-shadow: 0 0 0 0.2rem #bfdbfe;
+        }
+      }
+      .p-sidebar-icon {
+        width: 2rem;
+        height: 2rem;
+        color: $color_2;
+        border: 0 none;
+        background: transparent;
+        border-radius: 50%;
+        transition:
+          background-color 0.2s,
+          color 0.2s,
+          box-shadow 0.2s;
+        &:enabled {
+          &:hover {
+            color: $color_3;
+            border-color: $border-color_1;
+            background: #e9ecef;
+          }
+        }
+        &:focus {
+          outline: 0 none;
+          outline-offset: 0;
+          box-shadow: 0 0 0 0.2rem #bfdbfe;
+        }
+      }
+      + {
+        .p-sidebar-content {
+          padding-top: 0;
+        }
+      }
+    }
+    .p-sidebar-content {
+      padding: 1.25rem;
+    }
+  }
+  .p-component-overlay {
+    background-color: rgba(0, 0, 0, 0.4);
+    transition-duration: 0.2s;
+  }
+  .p-component-overlay-leave {
+    animation: p-component-overlay-leave-animation 150ms forwards;
+  }
+  @keyframes p-component-overlay-leave-animation {
+    from {
+      background-color: var(--maskbg);
+    }
+    to {
+      background-color: transparent;
+    }
+  }
+}

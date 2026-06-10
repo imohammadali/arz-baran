@@ -1,0 +1,20 @@
+.p-calendar-clear-icon {
+  cursor: pointer;
+  display: inline-flex;
+  user-select: none;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  width: var(--p-datepicker-dropdown-width);
+  background: var(--p-danger-100);
+  border: 1px solid var(--p-datepicker-dropdown-border-color);
+  border-inline-start: 0 none;
+  color: var(--p-datepicker-dropdown-color);
+  transition:
+    background var(--p-datepicker-transition-duration),
+    color var(--p-datepicker-transition-duration),
+    border-color var(--p-datepicker-transition-duration),
+    outline-color var(--p-datepicker-transition-duration);
+  outline-color: transparent;
+}

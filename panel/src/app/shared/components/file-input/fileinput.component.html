@@ -1,0 +1,43 @@
+<p-fileUpload name="myfile[]" styleClass="border-none bg-transparent" #fileInput url="#" [multiple]="multiple" accept="image/*" maxFileSize="100000000" (onUpload)="onTemplatedUpload()" (onSelect)="onSelectedFiles($event)">
+  <ng-template pTemplate="content" let-files let-chooseCallback="chooseCallback" let-uploadedFiles="uploadedFiles" let-removeFileCallback="removeFileCallback" let-removeUploadedFileCallback="removeUploadedFileCallback">
+    <div class="flex flex-col gap-3">
+      @if (files?.length > 0) {
+        <div>
+          <div class="flex flex-wrap gap-3">
+            @for (file of files; track file; let i = $index) {
+              <div class="relative">
+                <div class="w-24 h-24 rounded-lg border border-gray-300 relative flex flex-col items-center justify-center overflow-hidden bg-gray-100">
+                  <img role="presentation" class="max-w-full max-h-full object-cover w-24 h-24" [alt]="file.name" [src]="file.objectURL" />
+                  <div class="absolute top-1 right-1 flex gap-1">
+                    <p-button (click)="previewFile(file)" severity="info" variant="text" styleClass="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-blue-600 transition-colors">
+                      <i class="icon icon-eye text-sm"></i>
+                    </p-button>
+                    <p-button (click)="onRemoveTemplatingFile($event, file, removeFileCallback, i)" severity="danger" variant="text" styleClass="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors">
+                      <i class="icon icon-delete text-sm"></i>
+                    </p-button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+      <div class="flex flex-col gap-2 w-fit">
+        @if (uploadFileRemaining && uploadFileResetStat) {
+          <div class="border text-xs text-red-500 border-red-500 rounded-md px-3 py-2 flex items-center">
+            <span class="">{{ 'ticket.remainingFileStat' | translate: { fileCount: uploadFileRemaining, fileTime: uploadFileResetStat | persianDate: true : (currentLanguage$ | async) } }}</span>
+          </div>
+        }
+        <p-button (click)="choose($event, chooseCallback)" severity="primary" variant="outlined">
+          <i class="icon icon-attach"></i>
+          <span>{{ 'ticket.add_file' | translate }}</span>
+        </p-button>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="header"> </ng-template>
+  <ng-template pTemplate="file"> </ng-template>
+</p-fileUpload>
+<app-drawer [(isOpen)]="showPreview">
+  <img [src]="selectedFile?.objectURL" alt="file" class="object-cover w-full" />
+</app-drawer>

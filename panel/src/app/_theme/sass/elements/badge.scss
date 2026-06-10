@@ -1,0 +1,105 @@
+$badge-type: 'primary', 'secondary', 'success', 'info', 'warning', 'danger';
+$badge-size: 'small', 'medium', 'large';
+
+@mixin badge() {
+  p-badge {
+    .p-badge {
+      border-radius: 50vh;
+      font-size: var(--badge_label-font-size);
+      font-weight: var(--badge_label-font-weight);
+      line-height: var(--badge_label-font-height);
+      color: var(--common-white);
+      margin: 0 0.2rem;
+      user-select: none;
+      font-family: var(--font-family);
+      border: 1px solid;
+      @each $type in $badge-type {
+        &.badge-#{$type} {
+          @if ($type== 'primary') {
+            background-color: var(--main-primary-color);
+          }
+          @if ($type== 'secondary') {
+            background-color: var(--main-secondary-color);
+          }
+          @if ($type== 'success') {
+            background-color: var(--main-success-color);
+          }
+          @if ($type== 'info') {
+            background-color: var(--main-info-color);
+          }
+          @if ($type== 'warning') {
+            background-color: var(--main-warning-color);
+          }
+          @if ($type== 'danger') {
+            background-color: var(--main-error-color);
+          }
+        }
+        &.badge-outline-#{$type} {
+          @if ($type== 'primary') {
+            border: 1px solid var(--outlined-resting-bg-primary-color);
+            color: var(--main-primary-color);
+          }
+          @if ($type== 'secondary') {
+            border: 1px solid var(--outlined-resting-bg-secondary-color);
+            color: var(--main-secondary-color);
+          }
+          @if ($type== 'success') {
+            border: 1px solid var(--outlined-resting-bg-success-color);
+            color: var(--main-success-color);
+          }
+          @if ($type== 'info') {
+            border: 1px solid var(--outlined-resting-bg-info-color);
+            color: var(--main-info-color);
+          }
+          @if ($type== 'warning') {
+            border: 1px solid var(--outlined-resting-bg-warning-color);
+            color: var(--main-warning-color);
+          }
+          @if ($type== 'danger') {
+            border: 1px solid var(--outlined-resting-bg-error-color);
+            color: var(--main-error-color);
+          }
+        }
+      }
+    }
+  }
+  .p-overlay-badge {
+    .p-badge {
+      border-radius: 50vh;
+      font-size: var(--badge_label-font-size);
+      font-weight: var(--badge_label-font-weight);
+      line-height: 0.5rem;
+      color: var(--common-white);
+      user-select: none;
+      font-family: var(--font-family);
+    }
+    &.badge-primary {
+      .p-badge {
+        background-color: var(--main-primary-color);
+      }
+    }
+    &.badge-secondary {
+      .p-badge {
+        background-color: var(--main-secondary-color);
+      }
+    }
+    &.badge-success {
+      .p-badge {
+        background-color: var(--main-success-color);
+      }
+    }
+    &.badge-info {
+      .p-badge {
+        background-color: var(--main-info-color);
+      }
+    }
+    &.badge-warning {
+      .p-badge {
+        background-color: var(--main-warning-color);
+      }
+    }
+    .p-badge-danger {
+      background-color: var(--main-error-color);
+    }
+  }
+}

@@ -1,0 +1,50 @@
+<nav class="hidden fixed top-0 right-0 left-0 z-[99] lg:flex lg:justify-center shadow-md lg:px-0 px-3 py-3 lg:py-5 bg-base-200 lg:w-full">
+  <div class="lg:max-w-[90vw] xl:max-w-[80vw] lg:min-w-[90vw] xl:min-w-[80vw] 2xl:min-w-[70vw] 2xl:max-w-[70vw] flex justify-between">
+    <div class="flex items-center lg:hidden">
+      <button (click)="showDrawer = true">
+        <img src="assets/font-icon/system/burger.svg" alt="" />
+      </button>
+    </div>
+    <div class="lg:flex items-center gap-3 hidden cursor-pointer" routerLink="/home">
+      <span *ngIf="(theme$ | async) !== 'dark-theme'" class="font-medium text-2xl text-primary">{{ 'home.club' | translate }}</span>
+      <span *ngIf="(theme$ | async) === 'dark-theme'" class="font-medium text-2xl text-white">{{ 'home.club' | translate }}</span>
+    </div>
+    <div class="flex items-center gap-5">
+      <button *ngIf="selectedBranch$ | async as selectedBranch" (click)="showSelectBranchLg = true" class="hidden end lg:flex items-center justify-center border border-solid border-primary rounded-lg px-6 py-3 gap-5 text-primary">
+        <i class="icon icon-location-fill"></i>
+        <span class="font-medium"> {{ selectedBranch.name }} </span>
+      </button>
+      <div routerLink="/notifications" class="hidden lg:flex cursor-pointer">
+        <i *ngIf="!(isNotificationUnread$ | async)" class="icon icon-notif text-primary lg:text-4xl w-6 !leading-[inherit] flex justify-center"></i>
+        <i *ngIf="isNotificationUnread$ | async" class="icon icon-notif text-primary lg:text-4xl w-6 !leading-[inherit] flex justify-center" pBadge severity="danger"></i>
+      </div>
+      <div class="hidden lg:flex cursor-pointer" routerLink="/settings">
+        <i class="icon icon-wallet-outline text-primary lg:text-4xl"></i>
+      </div>
+      <!--        <img src="assets/img/qrcode.png" alt="">-->
+    </div>
+  </div>
+</nav>
+<p-dialog maskStyleClass="backdrop-blur-sm" [modal]="true" [dismissableMask]="true" [(visible)]="showSelectBranchLg" [style]="{ width: '25rem' }">
+  <div class="flex flex-col gap-12">
+    <div class="flex w-full justify-center">
+      <h3 class="font-semibold lg:text-2xl">
+        {{ 'auth.select_branch' | translate }}
+      </h3>
+    </div>
+    <div class="flex flex-col gap-4">
+      <span class="lg:text-lg">{{ 'auth.select_branch_subtitle' | translate }}</span>
+      <div class="flex flex-col gap-3">
+        <div class="flex items-center" *ngFor="let branch of branches$ | async">
+          <p-radioButton name="branch" [(ngModel)]="selectedBranchModel" [value]="branch" [inputId]="branch.key" />
+          <label [for]="branch.key">{{ branch.name }}</label>
+        </div>
+      </div>
+    </div>
+    <div class="flex justify-center w-full">
+      <button class="btn btn-primary" (click)="changeBranch()">
+        {{ 'auth.select' | translate }}
+      </button>
+    </div>
+  </div>
+</p-dialog>

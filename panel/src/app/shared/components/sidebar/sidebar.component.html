@@ -1,0 +1,121 @@
+<aside class="shadow-md bg-base-200 flex lg:px-3 px-8 rounded-lg py-9">
+  <div class="aside-part-menu w-full" id="menu">
+    <div class="flex flex-col gap-3 w-full">
+      <div
+        class="w-full p-3 cursor-pointer"
+        routerLink="/home"
+        routerLinkActive="active"
+      >
+        <a class="flex items-center font-medium gap-3">
+          <i class="icon icon-users-fill text-2xl"></i>
+          <p>{{ "sidebar.admin_panel" | translate }}</p>
+        </a>
+      </div>
+      <!-- <div
+        class="w-full p-3 cursor-pointer"
+        routerLink="/point-history"
+        routerLinkActive="active"
+      >
+        <a class="flex items-center font-medium gap-3">
+          <i class="icon icon-transaction-outline"></i>
+          <p>{{ 'sidebar.transactions' | translate }}</p>
+        </a>
+      </div> -->
+      <div
+        class="w-full p-3 cursor-pointer"
+        routerLinkActive="active"
+        routerLink="/personal"
+      >
+        <a class="flex items-center font-medium gap-3">
+          <i class="icon icon-user-outline text-2xl"></i>
+          <p>{{ "sidebar.personal" | translate }}</p>
+        </a>
+      </div>
+      <div
+        class="w-full p-3 cursor-pointer"
+        routerLinkActive="active"
+        routerLink="/invite"
+      >
+        <a class="flex items-center font-medium gap-3">
+          <i class="icon icon-reffer-outline text-2xl"></i>
+          <p>{{ "sidebar.inviteFriends" | translate }}</p>
+        </a>
+      </div>
+      <div
+        class="w-full p-3 cursor-pointer"
+        routerLinkActive="active"
+        routerLink="/family"
+      >
+        <a class="flex items-center font-medium gap-3">
+          <i class="icon icon-family text-2xl"></i>
+          <p>{{ "sidebar.family" | translate }}</p>
+        </a>
+      </div>
+      <div
+        class="w-full p-3 cursor-pointer"
+        routerLink="/profile"
+        routerLinkActive="active"
+      >
+        <a class="flex items-center font-medium gap-3">
+          <i class="icon icon-transaction-outline text-2xl"></i>
+          <p>{{ "sidebar.profile" | translate }}</p>
+        </a>
+      </div>
+      <div
+        class="w-full p-3 cursor-pointer"
+        routerLink="/support"
+        routerLinkActive="active"
+      >
+        <a class="flex items-center font-medium gap-3">
+          <i class="icon icon-Support text-2xl"></i>
+          <p>{{ "sidebar.clubSupport" | translate }}</p>
+        </a>
+      </div>
+      <div
+        class="w-full p-3 cursor-pointer"
+        routerLink="/about"
+        routerLinkActive="active"
+      >
+        <a class="flex items-center font-medium gap-3">
+          <i class="icon icon-medal-star text-2xl"></i>
+          <p>{{ "sidebar.aboutClub" | translate }}</p>
+        </a>
+      </div>
+      <div
+        class="w-full p-3 cursor-pointer"
+        routerLink="/settings"
+        routerLinkActive="active"
+      >
+        <a class="flex items-center font-medium gap-3">
+          <i class="icon icon-tool-outline text-2xl"></i>
+          <p>{{ "sidebar.settings" | translate }}</p>
+        </a>
+      </div>
+      <p-button
+        (click)="logout()"
+        [fluid]="true"
+        severity="danger"
+        variant="text"
+        styleClass="justify-start gap-3 bg-error-10"
+      >
+        <i class="icon icon-logout text-red-500 text-2xl"></i>
+        <p class="text-red-500">
+          {{ "sidebar.logout" | translate }}
+        </p>
+      </p-button>
+      <div class="flex flex-col gap-3 mt-2">
+        <span class="text-xs">
+          {{ "sidebar.login_at" | translate }}
+          {{
+            (user$ | async)?.login_at
+              | persianDate: true : (currentLanguage$ | async)
+          }}
+        </span>
+        <span class="text-xs">
+          {{ "sidebar.login_ip" | translate }}
+          {{ (user$ | async)?.last_login_ip || "-" }}
+        </span>
+      </div>
+    </div>
+  </div>
+</aside>

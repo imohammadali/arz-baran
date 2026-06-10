@@ -1,0 +1,9 @@
+<p-drawer [appendTo]="appendTo || 'body'" [(visible)]="visibleMobile" position="bottom" (onHide)="onHideDrawer()" styleClass="h-auto" [blockScroll]="true">
+  <ng-container *ngTemplateOutlet="theContent"></ng-container>
+</p-drawer>
+<p-dialog maskStyleClass="backdrop-blur-sm" [modal]="true" [dismissableMask]="true" [(visible)]="visibleDesktop" [style]="{ width: '25rem' }" (onHide)="onHideDrawer()">
+  <ng-container *ngTemplateOutlet="theContent"></ng-container>
+</p-dialog>
+<ng-template #theContent>
+  <ng-content></ng-content>
+</ng-template>

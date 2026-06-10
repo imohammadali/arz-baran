@@ -1,0 +1,55 @@
+<div class="wrapper overflow-y-auto">
+  <div class="content">
+    <p-toast position="top-center" [style]="{ top: '5px' }">
+      <ng-template let-message pTemplate="message">
+        <div routerLink="/notifications" class="flex flex-col gap-1 flex-1 cursor-pointer">
+          <div class="flex items-center gap-2">
+            @switch (message.severity) {
+              @case ('error') {
+                <div class="bg-error-110 p-[4px] rounded-lg flex items-center justify-center">
+                  <i class="icon icon-message-outline text-white"></i>
+                </div>
+              }
+              @case ('info') {
+                @if (message?.data?.image_url) {
+                  <img [src]="message?.data?.image_url || 'img/placeholder.png'" alt="notification" class="w-10 h-10 object-cover rounded-full" />
+                } @else {
+                  <div class="bg-info-110 p-[4px] rounded-lg flex items-center justify-center">
+                    <i class="icon icon-message-outline text-white"></i>
+                  </div>
+                }
+              }
+              @case ('warning') {
+                <div class="bg-warning-110 p-[4px] rounded-lg flex items-center justify-center">
+                  <i class="icon icon-message-outline text-white"></i>
+                </div>
+              }
+              @case ('success') {
+                <div class="bg-success-110 p-[4px] rounded-lg flex items-center justify-center">
+                  <i class="icon icon-message-outline text-white"></i>
+                </div>
+              }
+            }
+            <div class="text-sm text-black line-clamp-1">{{ message.summary ?? (message.severity === 'error' ? ('feedback.error' | translate) : message.severity === 'success' ? ('feedback.done_successfully' | translate) : '') }}</div>
+          </div>
+          <div class="text-xs text-secondary line-clamp-1">
+            {{ message.detail }}
+          </div>
+        </div>
+      </ng-template>
+    </p-toast>
+    <p-confirmdialog #cd [breakpoints]="{ '960px': '75vw', '640px': '90vw' }">
+      <ng-template #headless let-message let-onAccept="onAccept" let-onReject="onReject">
+        <div class="flex flex-col items-center p-8 bg-surface-0 dark:bg-surface-900 rounded">
+          <span class="font-bold text-2xl block mb-2 mt-6">{{ message.header }}</span>
+          <p class="mb-0">{{ message.message }}</p>
+          <div class="flex items-center gap-2 mt-6">
+            <p-button (onClick)="onAccept()" styleClass="w-32">{{ 'feedback.yes' | translate }}</p-button>
+            <p-button [outlined]="true" (onClick)="onReject()" styleClass="w-32">{{ 'feedback.no' | translate }}</p-button>
+          </div>
+        </div>
+      </ng-template>
+    </p-confirmdialog>
+    <router-outlet></router-outlet>
+  </div>
+</div>

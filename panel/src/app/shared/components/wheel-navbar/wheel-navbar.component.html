@@ -1,0 +1,31 @@
+<nav class="grid grid-cols-3 lg:flex lg:justify-between bg-base-200 shadow-md p-3 lg:px-20 lg:py-5">
+  <div class="lg:hidden flex items-center">
+    <img (click)="goBack()" src="fonts/system/back.svg" alt="" />
+  </div>
+  <div class="lg:flex hidden cursor-pointer" routerLink="/home">
+    <div class="lg:flex items-center gap-3 hidden cursor-pointer" routerLink="/home">
+      @if ((theme$ | async) !== 'dark-theme') {
+        <span class="font-medium text-2xl text-primary">{{ 'home.club' | translate }}</span>
+      }
+      @if ((theme$ | async) === 'dark-theme') {
+        <span class="font-medium text-2xl text-white">{{ 'home.club' | translate }}</span>
+      }
+    </div>
+    <div class="flex lg:hidden justify-center items-center">
+      <img [src]="'img/logo-' + (theme$ | async) + '.png'" routerLink="/home" alt="" class="max-w-8" />
+    </div>
+  </div>
+  <div class="lg:hidden flex justify-center items-center">
+    <div class="flex justify-center lg:justify-start font-medium lg:font-semibold lg:text-2xl text-xl text-nowrap">
+      {{ 'wheel.title' | translate }}
+    </div>
+  </div>
+  <div class="lg:hidden flex justify-end items-center">
+    <!-- <img src="fonts/system/question.svg" alt="" class="" /> -->
+  </div>
+  <div class="hidden lg:flex items-center gap-5">
+    <p-button severity="primary" variant="outlined" routerLink="/home">
+      {{ 'navbar.back' | translate }}
+    </p-button>
+  </div>
+</nav>

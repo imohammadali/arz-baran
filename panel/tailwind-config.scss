@@ -1,0 +1,348 @@
+@use 'tailwindcss';
+@plugin 'tailwindcss-primeui';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* =========================================
+   BASE TOKENS — DEFAULT (GREEN) THEME
+========================================= */
+
+:root,
+[data-theme='default-theme'] {
+  /* Primary — full palette */
+  --color-primary-50: #1c9f6b;
+  --color-primary-100: #3fbd99;
+  --color-primary-200: #5bab49;
+  --color-primary-300: #7cbc6d;
+  --color-primary-400: #0e5e00;
+  --color-primary-500: #5bab49;
+  --color-primary-600: #4a913b;
+  --color-primary-700: #3b7830;
+  --color-primary-800: #2c5e25;
+  --color-primary-900: #1e451a;
+  --color-primary-950: #102b10;
+  --color-primary-5: #f7fcfb;
+  --color-primary-10: #f0fae9;
+  --color-primary-11: #e0ebe8;
+
+  /* Secondary */
+  --color-secondary-500: rgba(138, 141, 147, 1);
+  --color-secondary-50: rgba(138, 141, 147, 0.1);
+
+  /* Surface — full palette */
+  --color-surface-0: #ffffff;
+  --color-surface-50: #f8f9fa;
+  --color-surface-100: #f1f3f5;
+  --color-surface-200: #e9ecef;
+  --color-surface-300: #dee2e6;
+  --color-surface-400: #ced4da;
+  --color-surface-500: #adb5bd;
+  --color-surface-600: #868e96;
+  --color-surface-700: #495057;
+  --color-surface-800: #343a40;
+  --color-surface-900: #212529;
+  --color-surface-950: #0d1117;
+
+  /* Content / Text */
+  --color-content: rgba(92, 92, 92, 1);
+
+  /* Success */
+  --color-success-500: rgba(102, 198, 28, 1);
+  --color-success-10: rgba(102, 198, 28, 0.1);
+  --color-success-110: rgba(80, 160, 20, 1);
+
+  /* Warning */
+  --color-warning-500: rgba(255, 180, 0, 1);
+  --color-warning-10: rgba(234, 170, 8, 0.1);
+  --color-warning-110: rgba(200, 140, 0, 1);
+
+  /* Info */
+  --color-info-500: rgba(76, 158, 204, 1);
+  --color-info-10: rgba(76, 158, 204, 0.1);
+  --color-info-110: rgba(60, 130, 180, 1);
+
+  /* Error / Danger */
+  --color-danger-500: rgba(240, 68, 56, 1);
+  --color-error-10: rgba(240, 68, 56, 0.1);
+  --color-error-100: #fce0de;
+  --color-error-110: #f04438;
+
+  /* Background */
+  --color-bg-100: #fafafa;
+
+  /* Semantic */
+  --color-semantic-success: rgba(102, 198, 28, 1);
+
+  /* Base */
+  --color-base-100: #fafafa;
+  --color-base-200: #ffffff;
+  --color-base-300: #f3f4f6;
+  --color-base-content: rgba(92, 92, 92, 1);
+
+  /* Box Shadows */
+  --box-shadow-1: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --box-shadow-2: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --box-shadow-3: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --box-shadow-4: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --box-shadow-5: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --box-shadow-6: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --box-shadow-7: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  --box-shadow-8: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --box-shadow-9: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --box-shadow-10: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  --box-shadow-11: 0 3px 6px 0 rgba(0, 0, 0, 0.07);
+  --box-shadow-12: 0 6px 12px -2px rgba(0, 0, 0, 0.1);
+  --box-shadow-13: 0 12px 24px -4px rgba(0, 0, 0, 0.1);
+  --box-shadow-14: 0 4px 8px -2px rgba(0, 0, 0, 0.08);
+  --box-shadow-15: 0 8px 16px -4px rgba(0, 0, 0, 0.1);
+  --box-shadow-16: 0 16px 32px -8px rgba(0, 0, 0, 0.12);
+  --box-shadow-17: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+  --box-shadow-18: 0 4px 12px -2px rgba(0, 0, 0, 0.1);
+  --box-shadow-19: 0 8px 20px -4px rgba(0, 0, 0, 0.12);
+  --box-shadow-20: 0 12px 28px -6px rgba(0, 0, 0, 0.15);
+  --box-shadow-21: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+  --box-shadow-22: 0 4px 8px 0 rgba(0, 0, 0, 0.06);
+  --box-shadow-23: 0 8px 16px 0 rgba(0, 0, 0, 0.08);
+  --box-shadow-24: 0 16px 32px 0 rgba(0, 0, 0, 0.12);
+
+  /* Transition */
+  --transition: all 0.3s ease;
+}
+
+/* =========================================
+   BLUE THEME
+========================================= */
+
+[data-theme='blue-theme'] {
+  --color-primary-50: #398adb;
+  --color-primary-100: #58a0e5;
+  --color-primary-200: #82bbed;
+  --color-primary-300: #82bbed;
+  --color-primary-400: #58a0e5;
+  --color-primary-500: #398adb;
+  --color-primary-600: #2d72b5;
+  --color-primary-700: #235a90;
+  --color-primary-800: #1a436b;
+  --color-primary-900: #112d47;
+  --color-primary-950: #091a28;
+  --color-primary-5: #f7fbff;
+  --color-primary-10: #eef6fd;
+  --color-primary-11: #e0effa;
+
+  --color-base-100: #fafafa;
+  --color-base-200: #ffffff;
+  --color-base-300: #f3f4f6;
+  --color-base-content: rgba(92, 92, 92, 1);
+}
+
+/* =========================================
+   PURPLE THEME
+========================================= */
+
+[data-theme='purple-theme'] {
+  --color-primary-50: #885dde;
+  --color-primary-100: #9d7ae5;
+  --color-primary-200: #b79eed;
+  --color-primary-300: #b79eed;
+  --color-primary-400: #9d7ae5;
+  --color-primary-500: #885dde;
+  --color-primary-600: #6f45c4;
+  --color-primary-700: #5833a0;
+  --color-primary-800: #422580;
+  --color-primary-900: #2d1860;
+  --color-primary-950: #1a0d40;
+  --color-primary-5: #faf8ff;
+  --color-primary-10: #f3edfd;
+  --color-primary-11: #ece0fb;
+
+  --color-base-100: #fafafa;
+  --color-base-200: #ffffff;
+  --color-base-300: #f3f4f6;
+  --color-base-content: rgba(92, 92, 92, 1);
+}
+
+/* =========================================
+   DARK THEME
+========================================= */
+
+[data-theme='dark-theme'] {
+  --color-primary-50: #1c9f6b;
+  --color-primary-100: #3fbd99;
+  --color-primary-200: #5bab49;
+  --color-primary-300: #7cbc6d;
+  --color-primary-400: #0e5e00;
+  --color-primary-500: #5bab49;
+  --color-primary-600: #4a913b;
+  --color-primary-700: #3b7830;
+  --color-primary-800: #2c5e25;
+  --color-primary-900: #1e451a;
+  --color-primary-950: #102b10;
+  --color-primary-5: #f7fcfb;
+  --color-primary-10: #f0fae9;
+  --color-primary-11: #e0ebe8;
+
+  --color-secondary-50: rgba(138, 141, 147, 0.2);
+
+  --color-surface-0: #1a1a1a;
+  --color-surface-50: #2d2d2d;
+  --color-surface-100: #404040;
+  --color-surface-200: #525252;
+  --color-surface-300: #666666;
+  --color-surface-400: #808080;
+  --color-surface-500: #999999;
+  --color-surface-600: #b3b3b3;
+  --color-surface-700: #cccccc;
+  --color-surface-800: #e0e0e0;
+  --color-surface-900: #f0f0f0;
+  --color-surface-950: #f8f8f8;
+
+  --color-content: #e0e0e0;
+
+  --color-success-10: rgba(102, 198, 28, 0.15);
+  --color-success-110: rgba(102, 198, 28, 1);
+  --color-warning-10: rgba(234, 170, 8, 0.15);
+  --color-warning-110: rgba(234, 170, 8, 1);
+  --color-info-10: rgba(76, 158, 204, 0.15);
+  --color-info-110: rgba(76, 158, 204, 1);
+  --color-error-10: rgba(240, 68, 56, 0.15);
+  --color-error-100: #fce0de;
+  --color-error-110: #f04438;
+
+  --color-bg-100: #2d2d2d;
+  --color-semantic-success: rgba(102, 198, 28, 1);
+
+  --color-base-100: #2d2d2d;
+  --color-base-200: #1a1a1a;
+  --color-base-300: #404040;
+  --color-base-content: #e0e0e0;
+
+  color-scheme: dark;
+}
+
+/* =========================================
+   TAILWIND V4 TOKENS
+========================================= */
+
+@theme {
+  /* Fonts */
+  --font-roboto: Roboto;
+  --font-vazir: Roboto;
+  --font-num-fa: 'IRANYekanXFaNum';
+
+  /* Font Sizes */
+  --text-3xl: 26px;
+  --text-2xs: 10px;
+
+  /* Primary Colors */
+  --color-primary-5: var(--color-primary-5);
+  --color-primary-10: var(--color-primary-10);
+  --color-primary-11: var(--color-primary-11);
+  --color-primary-50: var(--color-primary-50);
+  --color-primary-100: var(--color-primary-100);
+  --color-primary-200: var(--color-primary-200);
+  --color-primary-300: var(--color-primary-300);
+  --color-primary-400: var(--color-primary-400);
+  --color-primary-500: var(--color-primary-500);
+  --color-primary-600: var(--color-primary-600);
+  --color-primary-700: var(--color-primary-700);
+  --color-primary-800: var(--color-primary-800);
+  --color-primary-900: var(--color-primary-900);
+  --color-primary-950: var(--color-primary-950);
+
+  /* Secondary Colors */
+  --color-secondary-50: var(--color-secondary-50);
+  --color-secondary-500: var(--color-secondary-500);
+
+  /* Success */
+  --color-success-10: var(--color-success-10);
+  --color-success-110: var(--color-success-110);
+  --color-success-500: var(--color-success-500);
+
+  /* Warning */
+  --color-warning-10: var(--color-warning-10);
+  --color-warning-110: var(--color-warning-110);
+  --color-warning-500: var(--color-warning-500);
+
+  /* Info */
+  --color-info-10: var(--color-info-10);
+  --color-info-110: var(--color-info-110);
+  --color-info-500: var(--color-info-500);
+
+  /* Error / Danger */
+  --color-error-10: var(--color-error-10);
+  --color-error-100: var(--color-error-100);
+  --color-error-110: var(--color-error-110);
+  --color-danger-500: var(--color-danger-500);
+
+  /* Background */
+  --color-bg-100: var(--color-bg-100);
+
+  /* Semantic */
+  --color-semantic-success: var(--color-semantic-success);
+
+  /* Surface */
+  --color-surface-0: var(--color-surface-0);
+  --color-surface-50: var(--color-surface-50);
+  --color-surface-100: var(--color-surface-100);
+  --color-surface-200: var(--color-surface-200);
+  --color-surface-300: var(--color-surface-300);
+  --color-surface-400: var(--color-surface-400);
+  --color-surface-500: var(--color-surface-500);
+  --color-surface-600: var(--color-surface-600);
+  --color-surface-700: var(--color-surface-700);
+  --color-surface-800: var(--color-surface-800);
+  --color-surface-900: var(--color-surface-900);
+  --color-surface-950: var(--color-surface-950);
+
+  /* Base */
+  --color-base-100: var(--color-base-100);
+  --color-base-200: var(--color-base-200);
+  --color-base-300: var(--color-base-300);
+  --color-base-content: var(--color-base-content);
+
+  /* Box Shadows */
+  --shadow-1: var(--box-shadow-1);
+  --shadow-2: var(--box-shadow-2);
+  --shadow-3: var(--box-shadow-3);
+  --shadow-4: var(--box-shadow-4);
+  --shadow-5: var(--box-shadow-5);
+  --shadow-6: var(--box-shadow-6);
+  --shadow-7: var(--box-shadow-7);
+  --shadow-8: var(--box-shadow-8);
+  --shadow-9: var(--box-shadow-9);
+  --shadow-10: var(--box-shadow-10);
+  --shadow-11: var(--box-shadow-11);
+  --shadow-12: var(--box-shadow-12);
+  --shadow-13: var(--box-shadow-13);
+  --shadow-14: var(--box-shadow-14);
+  --shadow-15: var(--box-shadow-15);
+  --shadow-16: var(--box-shadow-16);
+  --shadow-17: var(--box-shadow-17);
+  --shadow-18: var(--box-shadow-18);
+  --shadow-19: var(--box-shadow-19);
+  --shadow-20: var(--box-shadow-20);
+  --shadow-21: var(--box-shadow-21);
+  --shadow-22: var(--box-shadow-22);
+  --shadow-23: var(--box-shadow-23);
+  --shadow-24: var(--box-shadow-24);
+
+  /* Transition Property */
+  --transition-property-custom: var(--transition);
+
+  /* Grid Template Columns */
+  --grid-template-columns-auto-fill-100: repeat(auto-fill, minmax(100px, 1fr));
+  --grid-template-columns-auto-fill-140: repeat(auto-fill, minmax(140px, 1fr));
+  --grid-template-columns-auto-fit-100: repeat(auto-fit, minmax(100px, 1fr));
+}
+
+/* =========================================
+   GLOBAL STYLES
+========================================= */
+
+body {
+  background: var(--color-surface-50);
+  color: var(--color-content);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}

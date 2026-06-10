@@ -1,0 +1,17 @@
+
+::ng-deep .tooltip-class {
+  font-size: 0.7rem !important;
+}
+.action-button {
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+.action-button span {
+  &:not(:last-child) {
+    margin-inline-end: 1rem;
+  }
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}

@@ -1,0 +1,23 @@
+{
+  "/club": {
+    "target": {
+      "host": "127.0.0.1",
+      "protocol": "http",
+      "port": 6200
+    },
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "ws": true
+  },
+  "/media": {
+    "target": {
+      "host": "127.0.0.1",
+      "protocol": "http",
+      "port": 6200
+    },
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}
