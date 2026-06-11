@@ -1,7 +1,7 @@
 .PHONY: help build run test tidy lint \
 	migrate-up migrate-down migrate-status migrate-version \
 	sqlc-generate sqlc-compile db-schema-sync db-check install-tools \
-	docker-setup-env docker-up docker-down docker-logs docker-reset docker-ready docker-debug-up
+	docker-setup-env docker-clean docker-up docker-down docker-logs docker-reset docker-ready docker-debug-up
 
 GO              := go
 BINARY          := bin/api
@@ -104,7 +104,14 @@ db-check: install-tools
 
 # --- Docker (see docker/README.md) ---
 
-COMPOSE  ?= docker compose
+ifeq ($(shell docker compose version >/dev/null 2>&1 && echo yes),yes)
+COMPOSE ?= docker compose
+else ifneq ($(shell command -v docker-compose 2>/dev/null),)
+COMPOSE ?= docker-compose
+else
+COMPOSE ?= docker compose
+endif
+
 API_PORT ?= 8080
 API_URL  ?= http://localhost:$(API_PORT)
 
@@ -112,18 +119,23 @@ docker-setup-env:
 	@test -f .env || cp .env.example .env
 	@echo "created .env from .env.example"
 
-docker-up: docker-setup-env
-	$(COMPOSE) up -d --build
+docker-clean:
+	-$(COMPOSE) down --remove-orphans 2>/dev/null
+	-docker rm -f exchange-api 2>/dev/null
+	@docker ps -aq --filter label=com.docker.compose.project=exchange 2>/dev/null | xargs -r docker rm -f 2>/dev/null || true
+
+docker-up: docker-setup-env docker-clean
+	$(COMPOSE) up -d --build --remove-orphans
 
 docker-down:
-	$(COMPOSE) down
+	$(COMPOSE) down --remove-orphans
 
 docker-logs:
 	$(COMPOSE) logs -f api
 
 docker-reset: docker-down
-	$(COMPOSE) down -v
-	$(COMPOSE) up -d --build
+	$(COMPOSE) down -v --remove-orphans
+	$(COMPOSE) up -d --build --remove-orphans
 
 docker-ready:
 	@echo "waiting for $(API_URL)/health/ready"
@@ -133,5 +145,5 @@ docker-ready:
 	done; \
 	echo "API not ready"; exit 1
 
-docker-debug-up: docker-setup-env
-	$(COMPOSE) -f docker-compose.yml -f docker-compose.debug.yml up -d --build
+docker-debug-up: docker-setup-env docker-clean
+	$(COMPOSE) -f docker-compose.yml -f docker-compose.debug.yml up -d --build --remove-orphans
