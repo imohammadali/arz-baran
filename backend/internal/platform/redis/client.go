@@ -1,42 +1,40 @@
+// Package redis provides the shared Redis client.
 package redis
 
 import (
 	"context"
 	"fmt"
-	"time"
 
+	"github.com/imohammadali/arz-baran/backend/internal/platform/config"
 	goredis "github.com/redis/go-redis/v9"
 )
 
-const defaultPingTimeout = 5 * time.Second
-
+// Client wraps a go-redis client.
 type Client struct {
 	*goredis.Client
 }
 
-func Connect(ctx context.Context, redisURL string) (*Client, error) {
-	opts, err := goredis.ParseURL(redisURL)
-	if err != nil {
-		return nil, fmt.Errorf("parse redis url: %w", err)
-	}
+// NewClient creates and verifies a Redis connection.
+func NewClient(ctx context.Context, cfg config.Redis) (*Client, error) {
+	client := goredis.NewClient(&goredis.Options{
+		Addr:     cfg.Addr,
+		Password: cfg.Password,
+	})
 
-	client := goredis.NewClient(opts)
-
-	pingCtx, cancel := context.WithTimeout(ctx, defaultPingTimeout)
-	defer cancel()
-
-	if err := client.Ping(pingCtx).Err(); err != nil {
+	if err := client.Ping(ctx).Err(); err != nil {
 		_ = client.Close()
-		return nil, fmt.Errorf("ping redis: %w", err)
+		return nil, fmt.Errorf("redis: ping: %w", err)
 	}
 
 	return &Client{Client: client}, nil
 }
 
-func (c *Client) Ping(ctx context.Context) error {
-	return c.Client.Ping(ctx).Err()
+// Pinger supports health checks.
+type Pinger interface {
+	Ping(ctx context.Context) error
 }
 
-func (c *Client) Close() error {
-	return c.Client.Close()
+// Ping implements Pinger.
+func (c *Client) Ping(ctx context.Context) error {
+	return c.Client.Ping(ctx).Err()
 }

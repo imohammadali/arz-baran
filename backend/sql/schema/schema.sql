@@ -1,5 +1,7 @@
-CREATE TABLE schema_metadata (
-    key        TEXT PRIMARY KEY,
-    value      TEXT NOT NULL,
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+-- Schema snapshot for sqlc.
+-- DO NOT EDIT — regenerate with: make db-schema-sync
+--
+-- DDL source of truth: migrations/
+
+-- Mirrors migrations/00001_platform_extensions.sql until db-schema-sync runs against a live DB.
+CREATE EXTENSION IF NOT EXISTS pgcrypto;

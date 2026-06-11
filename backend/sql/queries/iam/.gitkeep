@@ -1,0 +1,2 @@
+-- IAM queries: owned by internal/module/iam.
+-- Add queries when iam migrations (00010+) are approved.

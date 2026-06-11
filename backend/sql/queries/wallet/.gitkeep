@@ -1,0 +1,2 @@
+-- Wallet queries: owned by internal/module/wallet.
+-- Blocked until ADR-001 ledger model is approved.

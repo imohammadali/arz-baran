@@ -1,36 +1,113 @@
+# Exchange backend — local development stack
+#
+# Setup:
+#   cp .env.example .env
+#   docker compose up -d --build
+#
+# Debug profile (publish Postgres + Redis to host):
+#   docker compose --profile debug up -d
+#
+# CI profile (ephemeral volumes, no restart):
+#   docker compose -f docker-compose.yml -f docker-compose.ci.yml up --abort-on-container-exit
+
+name: exchange
+
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: arz-baran-postgres
-    restart: unless-stopped
+    container_name: exchange-postgres
     environment:
-      POSTGRES_DB: arz_baran
-      POSTGRES_USER: arz_baran
-      POSTGRES_PASSWORD: arz_baran
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: ${POSTGRES_USER:-exchange}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+      POSTGRES_DB: ${POSTGRES_DB:-exchange}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - exchange-internal
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U arz_baran -d arz_baran"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-exchange} -d ${POSTGRES_DB:-exchange}",
+        ]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
-    container_name: arz-baran-redis
-    restart: unless-stopped
-    ports:
-      - "6380:6379"
+    container_name: exchange-redis
+    command:
+      - redis-server
+      - --requirepass
+      - ${REDIS_PASSWORD:-change-me}
+      - --appendonly
+      - "yes"
     volumes:
       - redis_data:/data
+    networks:
+      - exchange-internal
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test:
+        [
+          "CMD",
+          "redis-cli",
+          "-a",
+          "${REDIS_PASSWORD:-change-me}",
+          "ping",
+        ]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: exchange-api
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      APP_VERSION: ${APP_VERSION:-dev}
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: "8080"
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: ${POSTGRES_USER:-exchange}
+      POSTGRES_DB: ${POSTGRES_DB:-exchange}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+      POSTGRES_SSLMODE: disable
+      POSTGRES_RUN_MIGRATIONS: ${POSTGRES_RUN_MIGRATIONS:-true}
+      REDIS_ADDR: redis:6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-change-me}
+      LOG_FORMAT: ${LOG_FORMAT:-text}
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
+    ports:
+      - "${API_PORT:-8080}:8080"
+    networks:
+      - exchange-internal
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    stop_grace_period: 35s
+    restart: unless-stopped
+
+networks:
+  exchange-internal:
+    name: exchange-internal
+    driver: bridge
 
 volumes:
   postgres_data:
+    name: exchange-postgres-data
   redis_data:
+    name: exchange-redis-data

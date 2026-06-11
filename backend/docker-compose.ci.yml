@@ -1,0 +1,19 @@
+# Override: CI integration test run (no persistent volumes, no auto-restart).
+#
+# Run a clean CI cycle:
+#   docker compose down -v
+#   docker compose -f docker-compose.yml -f docker-compose.ci.yml up --build --abort-on-container-exit --exit-code-from api
+#
+# Requires Docker Compose v2.24+ for volume reset.
+
+services:
+  postgres:
+    volumes: !reset []
+    restart: "no"
+
+  redis:
+    volumes: !reset []
+    restart: "no"
+
+  api:
+    restart: "no"

@@ -1,73 +1,44 @@
+// Package postgres provides the shared PostgreSQL connection pool.
 package postgres
 
 import (
 	"context"
 	"fmt"
-	"time"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/imohammadali/arz-baran/backend/internal/platform/config"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-const defaultPingTimeout = 5 * time.Second
-
+// Pool wraps a pgx connection pool.
 type Pool struct {
 	*pgxpool.Pool
 }
 
-func Connect(ctx context.Context, databaseURL string) (*Pool, error) {
-	cfg, err := pgxpool.ParseConfig(databaseURL)
+// NewPool creates and verifies a PostgreSQL connection pool.
+func NewPool(ctx context.Context, cfg config.Postgres) (*Pool, error) {
+	poolCfg, err := pgxpool.ParseConfig(cfg.DSN())
 	if err != nil {
-		return nil, fmt.Errorf("parse database url: %w", err)
+		return nil, fmt.Errorf("postgres: parse config: %w", err)
+	}
+	poolCfg.MaxConns = int32(cfg.MaxOpenConns)
+	poolCfg.MinConns = int32(cfg.MaxIdleConns)
+
+	pool, err := pgxpool.NewWithConfig(ctx, poolCfg)
+	if err != nil {
+		return nil, fmt.Errorf("postgres: connect: %w", err)
 	}
 
-	cfg.MaxConns = 20
-	cfg.MinConns = 2
-	cfg.MaxConnLifetime = 30 * time.Minute
-	cfg.MaxConnIdleTime = 5 * time.Minute
-	cfg.HealthCheckPeriod = 30 * time.Second
-
-	pool, err := pgxpool.NewWithConfig(ctx, cfg)
-	if err != nil {
-		return nil, fmt.Errorf("create pool: %w", err)
-	}
-
-	pingCtx, cancel := context.WithTimeout(ctx, defaultPingTimeout)
+	pingCtx, cancel := context.WithTimeout(ctx, cfg.ConnectTimeout)
 	defer cancel()
-
 	if err := pool.Ping(pingCtx); err != nil {
 		pool.Close()
-		return nil, fmt.Errorf("ping database: %w", err)
+		return nil, fmt.Errorf("postgres: ping: %w", err)
 	}
 
 	return &Pool{Pool: pool}, nil
 }
 
-func (p *Pool) Ping(ctx context.Context) error {
-	return p.Pool.Ping(ctx)
-}
-
-func (p *Pool) Close() {
-	p.Pool.Close()
-}
-
-func (p *Pool) WithTx(ctx context.Context, fn func(pgx.Tx) error) error {
-	tx, err := p.Pool.Begin(ctx)
-	if err != nil {
-		return fmt.Errorf("begin tx: %w", err)
-	}
-
-	defer func() {
-		_ = tx.Rollback(ctx)
-	}()
-
-	if err := fn(tx); err != nil {
-		return err
-	}
-
-	if err := tx.Commit(ctx); err != nil {
-		return fmt.Errorf("commit tx: %w", err)
-	}
-
-	return nil
+// Pinger supports health checks without exposing the full pool.
+type Pinger interface {
+	Ping(ctx context.Context) error
 }

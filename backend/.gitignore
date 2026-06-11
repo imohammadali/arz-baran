@@ -1,10 +1,18 @@
-bin/
+# Environment and secrets
 .env
-docs/.gen/
+.env.*
+!.env.example
+secrets/*
+!secrets/.gitkeep
+!secrets/*.example
 
-.idea/*
-*/__debug_*
-*logs*
-*__debug_bin*
-.vscode
-.cursor
+# Build artifacts
+/bin/
+/tmp/
+
+# IDE
+.idea/
+.vscode/
+
+# Test
+coverage.out

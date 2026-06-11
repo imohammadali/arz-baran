@@ -1,33 +1,137 @@
-.PHONY: up down logs migrate-up migrate-down sqlc run build test tidy
+.PHONY: help build run test tidy lint \
+	migrate-up migrate-down migrate-status migrate-version \
+	sqlc-generate sqlc-compile db-schema-sync db-check install-tools \
+	docker-setup-env docker-up docker-down docker-logs docker-reset docker-ready docker-debug-up
 
-DATABASE_URL ?= postgres://arz_baran:arz_baran@localhost:5432/arz_baran?sslmode=disable
+GO              := go
+BINARY          := bin/api
+MIGRATE_BIN     := bin/migrate
+MIGRATIONS_DIR  := migrations
+SQLC_CONFIG     := sqlc.yaml
+SCHEMA_FILE     := sql/schema/schema.sql
+GEN_SQLC_DIR    := gen/sqlc
 
-up:
-	docker-compose up -d
+GOOSE_VERSION   ?= v3.24.2
+SQLC_VERSION    ?= v1.28.0
 
-down:
-	docker-compose down
+# Load .env when present for local DATABASE_URL construction.
+ifneq (,$(wildcard .env))
+include .env
+export
+endif
 
-logs:
-	docker-compose logs -f
+POSTGRES_USER     ?= exchange
+POSTGRES_PASSWORD ?= change-me
+POSTGRES_HOST     ?= localhost
+POSTGRES_PORT     ?= 5432
+POSTGRES_DB       ?= exchange
+POSTGRES_SSLMODE  ?= disable
 
-migrate-up:
-	go run github.com/pressly/goose/v3/cmd/goose@v3.24.1 -dir migrations postgres "$(DATABASE_URL)" up
+DATABASE_URL ?= postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)?sslmode=$(POSTGRES_SSLMODE)
 
-migrate-down:
-	go run github.com/pressly/goose/v3/cmd/goose@v3.24.1 -dir migrations postgres "$(DATABASE_URL)" down
-
-sqlc:
-	sqlc generate
-
-run:
-	@go run ./cmd/api; exit 0
+help:
+	@echo "Application:"
+	@echo "  build              Compile API binary"
+	@echo "  run                Run API locally"
+	@echo "  test               Run tests"
+	@echo "  tidy               go mod tidy"
+	@echo "  lint               go vet"
+	@echo ""
+	@echo "Database (see sql/README.md):"
+	@echo "  install-tools      Install goose and sqlc CLIs"
+	@echo "  migrate-up         Apply goose migrations"
+	@echo "  migrate-down       Roll back one migration (dev only)"
+	@echo "  migrate-status     Show migration status"
+	@echo "  migrate-version    Print current migration version"
+	@echo "  sqlc-generate      Generate gen/sqlc/*"
+	@echo "  sqlc-compile       Verify sqlc queries compile"
+	@echo "  db-schema-sync     Dump schema to $(SCHEMA_FILE)"
+	@echo "  db-check           CI gate for schema + sqlc drift"
+	@echo ""
+	@echo "Docker:"
+	@echo "  docker-up          Start compose stack"
+	@echo "  docker-down        Stop compose stack"
+	@echo "  docker-reset       Reset volumes and restart"
+	@echo "  docker-ready       Wait for /health/ready"
 
 build:
-	go build -o bin/api ./cmd/api
+	$(GO) build -o $(BINARY) ./cmd/api
+
+build-migrate:
+	$(GO) build -o $(MIGRATE_BIN) ./cmd/migrate
+
+run: build
+	./$(BINARY)
 
 test:
-	go test ./...
+	$(GO) test ./...
 
 tidy:
-	go mod tidy
+	$(GO) mod tidy
+
+lint:
+	$(GO) vet ./...
+
+install-tools:
+	$(GO) install github.com/pressly/goose/v3/cmd/goose@$(GOOSE_VERSION)
+	$(GO) install github.com/sqlc-dev/sqlc/cmd/sqlc@$(SQLC_VERSION)
+
+migrate-up: install-tools
+	goose -dir $(MIGRATIONS_DIR) postgres "$(DATABASE_URL)" up
+
+migrate-down: install-tools
+	goose -dir $(MIGRATIONS_DIR) postgres "$(DATABASE_URL)" down
+
+migrate-status: install-tools
+	goose -dir $(MIGRATIONS_DIR) postgres "$(DATABASE_URL)" status
+
+migrate-version: build-migrate
+	$(MIGRATE_BIN) version
+
+sqlc-generate: install-tools
+	sqlc generate -f $(SQLC_CONFIG)
+
+sqlc-compile: install-tools
+	sqlc compile -f $(SQLC_CONFIG)
+
+db-schema-sync: install-tools
+	@chmod +x scripts/db-schema-sync.sh
+	DATABASE_URL="$(DATABASE_URL)" MIGRATIONS_DIR="$(MIGRATIONS_DIR)" ./scripts/db-schema-sync.sh
+
+db-check: install-tools
+	@chmod +x scripts/db-check.sh
+	DATABASE_URL="$(DATABASE_URL)" MIGRATIONS_DIR="$(MIGRATIONS_DIR)" ./scripts/db-check.sh
+
+# --- Docker (see docker/README.md) ---
+
+COMPOSE  ?= docker compose
+API_PORT ?= 8080
+API_URL  ?= http://localhost:$(API_PORT)
+
+docker-setup-env:
+	@test -f .env || cp .env.example .env
+	@echo "created .env from .env.example"
+
+docker-up: docker-setup-env
+	$(COMPOSE) up -d --build
+
+docker-down:
+	$(COMPOSE) down
+
+docker-logs:
+	$(COMPOSE) logs -f api
+
+docker-reset: docker-down
+	$(COMPOSE) down -v
+	$(COMPOSE) up -d --build
+
+docker-ready:
+	@echo "waiting for $(API_URL)/health/ready"
+	@for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do \
+		curl -sf "$(API_URL)/health/ready" >/dev/null && exit 0; \
+		sleep 2; \
+	done; \
+	echo "API not ready"; exit 1
+
+docker-debug-up: docker-setup-env
+	$(COMPOSE) -f docker-compose.yml -f docker-compose.debug.yml up -d --build

@@ -1,0 +1,2 @@
+-- Instrument queries: owned by internal/module/instrument.
+-- Add queries when instrument migrations (00030+) land.

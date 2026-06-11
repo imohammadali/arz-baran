@@ -1,0 +1,13 @@
+# Override: expose Postgres and Redis on the host for local tooling (psql, redis-cli).
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.debug.yml up -d
+
+services:
+  postgres:
+    ports:
+      - "${POSTGRES_PUBLISH_PORT:-5432}:5432"
+
+  redis:
+    ports:
+      - "${REDIS_PUBLISH_PORT:-6379}:6379"
