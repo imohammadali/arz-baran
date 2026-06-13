@@ -1,4 +1,4 @@
-// Package domain holds IAM entities, value objects, and domain errors.
+// Package domain holds the IAM bounded context's domain model:
+// the User aggregate root, Email value object, domain events, and domain errors.
+// No infrastructure, HTTP, or database dependencies are permitted in this package.
 package domain
-
-// Placeholder: IAM domain model lands with migration band 00010-00019.
