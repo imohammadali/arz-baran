@@ -20,6 +20,13 @@ SELECT COALESCE(
 FROM ledger_entries
 WHERE account_id = $1 AND asset_id = $2;
 
+-- Returns the sum of all active holds for the account+asset as text.
+-- Used alongside GetAvailableBalance to compute the true available-for-new-holds figure.
+-- name: GetActiveHoldsSum :one
+SELECT COALESCE(SUM(amount), 0)::text AS total
+FROM holds
+WHERE account_id = $1 AND asset_id = $2 AND status = 'active';
+
 -- name: InsertTransaction :one
 INSERT INTO transactions (id, idempotency_key, type, status)
 VALUES ($1, $2, $3, 'pending')

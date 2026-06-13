@@ -95,6 +95,25 @@ func (r *PostgresRepository) GetAvailableBalance(
 	return d, nil
 }
 
+func (r *PostgresRepository) GetActiveHoldsSum(
+	ctx context.Context,
+	accountID kernel.ID,
+	assetID kernel.AssetID,
+) (decimal.Decimal, error) {
+	s, err := r.q.GetActiveHoldsSum(ctx, walletdb.GetActiveHoldsSumParams{
+		AccountID: accountID,
+		AssetID:   string(assetID),
+	})
+	if err != nil {
+		return decimal.Zero, fmt.Errorf("wallet store: get active holds sum: %w", err)
+	}
+	d, err := decimal.NewFromString(s)
+	if err != nil {
+		return decimal.Zero, fmt.Errorf("wallet store: parse active holds sum %q: %w", s, err)
+	}
+	return d, nil
+}
+
 // --------------------------------------------------------------------------
 // Hold
 // --------------------------------------------------------------------------

@@ -32,6 +32,26 @@ func (q *Queries) CompleteTransaction(ctx context.Context, id uuid.UUID) (Transa
 	return i, err
 }
 
+const getActiveHoldsSum = `-- name: GetActiveHoldsSum :one
+SELECT COALESCE(SUM(amount), 0)::text AS total
+FROM holds
+WHERE account_id = $1 AND asset_id = $2 AND status = 'active'
+`
+
+type GetActiveHoldsSumParams struct {
+	AccountID uuid.UUID
+	AssetID   string
+}
+
+// Returns the sum of all active holds for the account+asset as text.
+// Used alongside GetAvailableBalance to compute the true available-for-new-holds figure.
+func (q *Queries) GetActiveHoldsSum(ctx context.Context, arg GetActiveHoldsSumParams) (string, error) {
+	row := q.db.QueryRow(ctx, getActiveHoldsSum, arg.AccountID, arg.AssetID)
+	var total string
+	err := row.Scan(&total)
+	return total, err
+}
+
 const getAvailableBalance = `-- name: GetAvailableBalance :one
 SELECT COALESCE(
     SUM(CASE WHEN direction = 'credit' THEN amount ELSE -amount END),

@@ -119,6 +119,12 @@ type Repository interface {
 	// the effective available balance.
 	GetAvailableBalance(ctx context.Context, accountID kernel.ID, assetID kernel.AssetID) (decimal.Decimal, error)
 
+	// GetActiveHoldsSum returns the total amount reserved by active holds for
+	// the account+asset pair. Call this alongside GetAvailableBalance (both
+	// inside the same transaction after LockAccountForUpdate) to compute the
+	// true spendable balance: spendable = posted_balance − active_holds_sum.
+	GetActiveHoldsSum(ctx context.Context, accountID kernel.ID, assetID kernel.AssetID) (decimal.Decimal, error)
+
 	// Hold operations
 
 	// InsertHold persists a new active Hold row. Returns
