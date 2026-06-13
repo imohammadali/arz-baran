@@ -33,7 +33,10 @@ func (q *Queries) CompleteTransaction(ctx context.Context, id uuid.UUID) (Transa
 }
 
 const getAvailableBalance = `-- name: GetAvailableBalance :one
-SELECT COALESCE(SUM(CASE WHEN direction = 'credit' THEN amount ELSE -amount END), 0) AS balance
+SELECT COALESCE(
+    SUM(CASE WHEN direction = 'credit' THEN amount ELSE -amount END),
+    0
+)::text AS balance
 FROM ledger_entries
 WHERE account_id = $1 AND asset_id = $2
 `
@@ -43,19 +46,45 @@ type GetAvailableBalanceParams struct {
 	AssetID   string
 }
 
-func (q *Queries) GetAvailableBalance(ctx context.Context, arg GetAvailableBalanceParams) (interface{}, error) {
+// Cast to text so sqlc emits string instead of interface{}.
+// Parsed as decimal.Decimal in the store adapter.
+func (q *Queries) GetAvailableBalance(ctx context.Context, arg GetAvailableBalanceParams) (string, error) {
 	row := q.db.QueryRow(ctx, getAvailableBalance, arg.AccountID, arg.AssetID)
-	var balance interface{}
+	var balance string
 	err := row.Scan(&balance)
 	return balance, err
 }
 
 const getHold = `-- name: GetHold :one
-SELECT id, account_id, amount, asset_id, status, idempotency_key, created_at, updated_at FROM holds WHERE id = $1
+SELECT id, account_id, amount, asset_id, status, idempotency_key, created_at, updated_at
+FROM holds
+WHERE id = $1
 `
 
 func (q *Queries) GetHold(ctx context.Context, id uuid.UUID) (Hold, error) {
 	row := q.db.QueryRow(ctx, getHold, id)
+	var i Hold
+	err := row.Scan(
+		&i.ID,
+		&i.AccountID,
+		&i.Amount,
+		&i.AssetID,
+		&i.Status,
+		&i.IdempotencyKey,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getHoldByIdempotencyKey = `-- name: GetHoldByIdempotencyKey :one
+SELECT id, account_id, amount, asset_id, status, idempotency_key, created_at, updated_at
+FROM holds
+WHERE idempotency_key = $1
+`
+
+func (q *Queries) GetHoldByIdempotencyKey(ctx context.Context, idempotencyKey string) (Hold, error) {
+	row := q.db.QueryRow(ctx, getHoldByIdempotencyKey, idempotencyKey)
 	var i Hold
 	err := row.Scan(
 		&i.ID,
@@ -92,6 +121,26 @@ func (q *Queries) GetOrCreateAccount(ctx context.Context, arg GetOrCreateAccount
 		&i.AssetID,
 		&i.AccountType,
 		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getTransactionByIdempotencyKey = `-- name: GetTransactionByIdempotencyKey :one
+SELECT id, idempotency_key, type, status, created_at, completed_at
+FROM transactions
+WHERE idempotency_key = $1
+`
+
+func (q *Queries) GetTransactionByIdempotencyKey(ctx context.Context, idempotencyKey string) (Transaction, error) {
+	row := q.db.QueryRow(ctx, getTransactionByIdempotencyKey, idempotencyKey)
+	var i Transaction
+	err := row.Scan(
+		&i.ID,
+		&i.IdempotencyKey,
+		&i.Type,
+		&i.Status,
+		&i.CreatedAt,
+		&i.CompletedAt,
 	)
 	return i, err
 }
@@ -191,6 +240,26 @@ func (q *Queries) InsertTransaction(ctx context.Context, arg InsertTransactionPa
 		&i.Status,
 		&i.CreatedAt,
 		&i.CompletedAt,
+	)
+	return i, err
+}
+
+const lockAccountForUpdate = `-- name: LockAccountForUpdate :one
+SELECT id, user_id, asset_id, account_type, created_at
+FROM accounts
+WHERE id = $1
+FOR UPDATE
+`
+
+func (q *Queries) LockAccountForUpdate(ctx context.Context, id uuid.UUID) (Account, error) {
+	row := q.db.QueryRow(ctx, lockAccountForUpdate, id)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.AssetID,
+		&i.AccountType,
+		&i.CreatedAt,
 	)
 	return i, err
 }

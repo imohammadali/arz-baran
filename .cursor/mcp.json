@@ -11,7 +11,10 @@
     },
     "github": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "REPLACE_WITH_YOUR_TOKEN"
       },
@@ -19,13 +22,11 @@
     },
     "sequential-thinking": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
       "description": "Structured multi-step reasoning — use for DDD architectural decisions, saga design, and Phase 1+ planning"
-    },
-    "fetch": {
-      "command": "uvx",
-      "args": ["mcp-server-fetch"],
-      "description": "HTTP fetch tool for testing live API endpoints (/v1/iam, /v1/wallet, /v1/trading)"
     }
   }
 }
