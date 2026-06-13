@@ -54,11 +54,7 @@ type User struct {
 // for hashing before calling this constructor).
 func NewUser(id kernel.ID, email Email, passwordHash string, now time.Time) (*User, error) {
 	if strings.TrimSpace(passwordHash) == "" {
-		return nil, kernel.NewDomainError(
-			kernel.ModuleIAM,
-			CodeUserNotFound, // reuse closest; a dedicated CodeUserInvalidPassword can be added later
-			"password hash must not be empty",
-		)
+		return nil, ErrUserInvalidPassword("password hash must not be empty")
 	}
 
 	u := &User{
@@ -76,7 +72,7 @@ func NewUser(id kernel.ID, email Email, passwordHash string, now time.Time) (*Us
 // Suspend transitions the User to Suspended. Returns an error if already Suspended.
 func (u *User) Suspend(now time.Time) error {
 	if u.Status == UserStatusSuspended {
-		return kernel.NewDomainError(kernel.ModuleIAM, CodeUserSuspended, "user is already suspended")
+		return ErrUserSuspended()
 	}
 	u.Status = UserStatusSuspended
 	u.UpdatedAt = now
@@ -87,7 +83,7 @@ func (u *User) Suspend(now time.Time) error {
 // Activate transitions the User to Active. Returns an error if already Active.
 func (u *User) Activate(now time.Time) error {
 	if u.Status == UserStatusActive {
-		return kernel.NewDomainError(kernel.ModuleIAM, CodeUserSuspended, "user is already active")
+		return ErrUserAlreadyActive()
 	}
 	u.Status = UserStatusActive
 	u.UpdatedAt = now

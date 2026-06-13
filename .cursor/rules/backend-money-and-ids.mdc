@@ -1,0 +1,48 @@
+---
+description: Money/decimal and ID conventions for the arz-baran backend — prevents float precision bugs and raw-string ID mismatches
+globs: backend/internal/**/*.go
+alwaysApply: false
+---
+
+# Money & IDs
+
+## Decimal — Never Float
+
+All monetary and quantity values use `github.com/shopspring/decimal`. Never use `float32` or `float64` for financial values.
+
+```go
+// ❌ BAD
+price := 0.1 + 0.2  // float precision error
+
+// ✅ GOOD
+price := decimal.NewFromString("0.1")
+total := price.Mul(qty)
+```
+
+- Serialise to DB as `NUMERIC` — never `FLOAT`
+- Serialise to JSON as a quoted string to avoid precision loss: `"0.10000"`
+- `Amount` on every `LedgerEntry` must be **strictly positive** (`d.IsPositive()`)
+
+## Double-Entry Invariant
+
+For any completed `Transaction`, across each `AssetID`:
+```
+sum(credits) == sum(debits)
+```
+Validate this in the AR before calling `Complete()`.
+
+## IDs — Always kernel.ID
+
+All domain identifiers use `kernel.ID` (a typed wrapper over `uuid.UUID`).
+
+```go
+// ❌ BAD
+userID string
+userID uuid.UUID
+
+// ✅ GOOD
+userID kernel.ID
+```
+
+- Generate new IDs with `kernel.NewID()`
+- `IdempotencyKey` fields are `string` but must be non-empty — validate at construction

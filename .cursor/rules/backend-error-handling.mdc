@@ -1,0 +1,54 @@
+---
+description: Error handling and HTTP mapping conventions for the arz-baran Go backend
+globs: backend/internal/**/*.go
+alwaysApply: false
+---
+
+# Error Handling
+
+## Wrapping
+
+Always wrap errors with context using `fmt.Errorf` and `%w`:
+
+```go
+// ❌ BAD
+return err
+return errors.New("something went wrong")
+
+// ✅ GOOD
+return fmt.Errorf("order service: place order: %w", err)
+```
+
+Convention: `"<layer>: <action>: %w"` — e.g. `"iam service: register user: %w"`
+
+## Domain Errors
+
+Define sentinel errors in `domain/errors.go` for each bounded context:
+
+```go
+// domain/errors.go
+var (
+    ErrOrderNotFound      = errors.New("order not found")
+    ErrOrderAlreadyFilled = errors.New("order already filled")
+)
+```
+
+Use `errors.Is()` to check, never string comparison.
+
+## HTTP Layer
+
+**Never write raw status codes in handlers.** Always go through `httpx.ErrorMapper`:
+
+```go
+// ❌ BAD
+return c.JSON(http.StatusNotFound, map[string]string{"error": "not found"})
+
+// ✅ GOOD
+return err  // Echo + ErrorMapper will map domain errors to HTTP status codes
+```
+
+Register domain → HTTP status mappings in the `httpx.DefaultRegistry`.
+
+## Panic
+
+Never use `panic` in domain or service code. Panics are only acceptable in `main()` for unrecoverable startup failures.

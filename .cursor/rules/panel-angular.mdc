@@ -1,0 +1,46 @@
+---
+description: Angular panel conventions — Jalali dates, RxJS lifecycle, and component patterns
+globs: panel/src/**/*.ts,panel/src/**/*.html
+alwaysApply: false
+---
+
+# Panel (Angular) Conventions
+
+## Jalali Dates
+
+Always use `jalali-moment` for date display — never raw `Date` or `toLocaleDateString`:
+
+```typescript
+// ❌ BAD
+new Date(ts).toLocaleDateString('fa-IR')
+
+// ✅ GOOD
+import jalaliMoment from 'jalali-moment';
+jalaliMoment(ts).locale('fa').format('jYYYY/jMM/jDD')
+```
+
+## RxJS — Unsubscribe
+
+Use `takeUntilDestroyed()` (Angular 16+) — never manage subscriptions manually:
+
+```typescript
+// ❌ BAD
+private destroy$ = new Subject<void>();
+ngOnDestroy() { this.destroy$.next(); }
+obs$.pipe(takeUntil(this.destroy$)).subscribe(...)
+
+// ✅ GOOD
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+obs$.pipe(takeUntilDestroyed()).subscribe(...)
+```
+
+## Naming
+
+- Component files: `kebab-case.component.ts`
+- Component classes: `PascalCaseComponent`
+- Services: `PascalCaseService` in `kebab-case.service.ts`
+- Avoid `any` — type API responses with interfaces
+
+## HTTP Calls
+
+All backend calls go through a typed service — never call `HttpClient` directly from a component.
