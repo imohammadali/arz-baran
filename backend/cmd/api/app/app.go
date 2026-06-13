@@ -12,6 +12,7 @@ import (
 	adminhandler "github.com/imohammadali/arz-baran/backend/internal/admin/handler"
 	"github.com/imohammadali/arz-baran/backend/internal/module/iam"
 	"github.com/imohammadali/arz-baran/backend/internal/module/instrument"
+	"github.com/imohammadali/arz-baran/backend/internal/module/trading"
 	"github.com/imohammadali/arz-baran/backend/internal/module/wallet"
 	"github.com/imohammadali/arz-baran/backend/internal/platform/config"
 	"github.com/imohammadali/arz-baran/backend/internal/platform/httpx"
@@ -66,15 +67,18 @@ func New(ctx context.Context) (*App, error) {
 	iamMod := iam.New(iam.Dependencies{Logger: log})
 	instrumentMod := instrument.New(instrument.Dependencies{Logger: log})
 	walletMod := wallet.New(wallet.Dependencies{Logger: log})
+	tradingMod := trading.New(trading.Dependencies{Logger: log})
 
 	iamAPI := iamMod.API()
 	instrumentAPI := instrumentMod.API()
 	walletAPI := walletMod.API()
+	tradingAPI := tradingMod.API()
 	_ = iamAPI        // wired into wallet in Phase 1
 	_ = instrumentAPI // wired into trading in Phase 3
 	_ = walletAPI     // wired into trading in Phase 3
+	_ = tradingAPI    // wired into matching engine in Phase 3
 
-	modules := []platformmodule.Module{iamMod, instrumentMod, walletMod}
+	modules := []platformmodule.Module{iamMod, instrumentMod, walletMod, tradingMod}
 
 	mapper := httpx.NewErrorMapper(httpx.DefaultRegistry)
 	httpServer := httpx.NewServer(httpx.Dependencies{
