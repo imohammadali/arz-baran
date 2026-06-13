@@ -23,7 +23,9 @@ type Dependencies struct {
 }
 
 // New constructs the instrument module.
+// TODO(Phase 3): pass deps.Logger down to service when store is wired.
 func New(deps Dependencies) *Module {
+	_ = deps.Logger
 	svc := service.New(nil)
 	return &Module{
 		api:     svc,

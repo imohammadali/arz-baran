@@ -4,17 +4,17 @@ package handler
 import (
 	"net/http"
 
-	"github.com/imohammadali/arz-baran/backend/internal/module/iam/service"
+	iamapi "github.com/imohammadali/arz-baran/backend/internal/module/iam/api"
 	"github.com/labstack/echo/v4"
 )
 
 // Handler registers IAM HTTP routes.
 type Handler struct {
-	svc *service.Service
+	svc iamapi.API
 }
 
 // New constructs the IAM HTTP handler.
-func New(svc *service.Service) *Handler {
+func New(svc iamapi.API) *Handler {
 	return &Handler{svc: svc}
 }
 

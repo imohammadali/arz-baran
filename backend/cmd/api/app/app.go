@@ -67,9 +67,12 @@ func New(ctx context.Context) (*App, error) {
 	instrumentMod := instrument.New(instrument.Dependencies{Logger: log})
 	walletMod := wallet.New(wallet.Dependencies{Logger: log})
 
-	_ = iamMod.API()
-	_ = instrumentMod.API()
-	_ = walletMod.API()
+	iamAPI := iamMod.API()
+	instrumentAPI := instrumentMod.API()
+	walletAPI := walletMod.API()
+	_ = iamAPI        // wired into wallet in Phase 1
+	_ = instrumentAPI // wired into trading in Phase 3
+	_ = walletAPI     // wired into trading in Phase 3
 
 	modules := []platformmodule.Module{iamMod, instrumentMod, walletMod}
 
