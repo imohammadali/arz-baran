@@ -2,7 +2,7 @@
 // versions:
 //   sqlc v1.28.0
 
-package platformdb
+package walletdb
 
 import (
 	"github.com/google/uuid"

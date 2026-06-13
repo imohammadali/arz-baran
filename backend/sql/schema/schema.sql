@@ -7,7 +7,6 @@
 -- PostgreSQL database dump
 --
 
-\restrict bAwRLV1ppecqXAqvPH8SiujNcRhSO8HqfG7rHX02pT3XqXLU723vaT3fddfj82x
 
 -- Dumped from database version 16.14
 -- Dumped by pg_dump version 16.14
@@ -387,5 +386,4 @@ ALTER TABLE ONLY public.trading_pairs
 -- PostgreSQL database dump complete
 --
 
-\unrestrict bAwRLV1ppecqXAqvPH8SiujNcRhSO8HqfG7rHX02pT3XqXLU723vaT3fddfj82x
 

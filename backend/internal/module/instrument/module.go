@@ -3,9 +3,12 @@ package instrument
 import (
 	"context"
 
+	"github.com/jackc/pgx/v5/pgxpool"
+
 	instrumentapi "github.com/imohammadali/arz-baran/backend/internal/module/instrument/api"
 	"github.com/imohammadali/arz-baran/backend/internal/module/instrument/handler"
 	"github.com/imohammadali/arz-baran/backend/internal/module/instrument/service"
+	"github.com/imohammadali/arz-baran/backend/internal/module/instrument/store"
 	"github.com/imohammadali/arz-baran/backend/internal/platform/logger"
 	platformmodule "github.com/imohammadali/arz-baran/backend/internal/platform/module"
 	"github.com/labstack/echo/v4"
@@ -20,13 +23,14 @@ type Module struct {
 // Dependencies required to construct the instrument module.
 type Dependencies struct {
 	Logger logger.ApplicationLogger
+	Pool   *pgxpool.Pool
 }
 
 // New constructs the instrument module.
-// TODO(Phase 3): pass deps.Logger down to service when store is wired.
 func New(deps Dependencies) *Module {
 	_ = deps.Logger
-	svc := service.New(nil)
+	repo := store.NewPostgresRepository(deps.Pool)
+	svc := service.New(repo)
 	return &Module{
 		api:     svc,
 		handler: handler.New(svc),

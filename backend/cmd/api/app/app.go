@@ -65,7 +65,7 @@ func New(ctx context.Context) (*App, error) {
 	}
 
 	iamMod := iam.New(iam.Dependencies{Logger: log})
-	instrumentMod := instrument.New(instrument.Dependencies{Logger: log})
+	instrumentMod := instrument.New(instrument.Dependencies{Logger: log, Pool: pg.Pool})
 	walletMod := wallet.New(wallet.Dependencies{Logger: log})
 	tradingMod := trading.New(trading.Dependencies{Logger: log})
 

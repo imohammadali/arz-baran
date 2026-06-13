@@ -22,23 +22,36 @@ if ! command -v goose >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! command -v pg_dump >/dev/null 2>&1; then
-  echo "pg_dump not found; install postgresql-client or use docker exec" >&2
-  exit 1
-fi
-
 echo "Applying migrations from ${MIGRATIONS_DIR}..."
 goose -dir "${MIGRATIONS_DIR}" postgres "${DATABASE_URL}" up
 
 TMP="$(mktemp)"
 trap 'rm -f "${TMP}"' EXIT
 
-pg_dump "${DATABASE_URL}" \
-  --schema-only \
-  --no-owner \
-  --no-privileges \
-  --no-comments \
-  > "${TMP}"
+# Prefer a local pg_dump; fall back to docker exec on the exchange-postgres container.
+if command -v pg_dump >/dev/null 2>&1; then
+  pg_dump "${DATABASE_URL}" \
+    --schema-only \
+    --no-owner \
+    --no-privileges \
+    --no-comments \
+    > "${TMP}"
+elif docker inspect exchange-postgres >/dev/null 2>&1; then
+  echo "pg_dump not found locally; using docker exec exchange-postgres..."
+  docker exec exchange-postgres pg_dump "${DATABASE_URL}" \
+    --schema-only \
+    --no-owner \
+    --no-privileges \
+    --no-comments \
+    > "${TMP}"
+else
+  echo "pg_dump not found and exchange-postgres container is not running." >&2
+  echo "Install postgresql-client or start the stack with: make docker-up" >&2
+  exit 1
+fi
+
+# Strip psql-only directives (\restrict, \unrestrict) that sqlc cannot parse.
+sed -i '/^\\[a-z]/d' "${TMP}"
 
 {
   cat <<'HEADER'
