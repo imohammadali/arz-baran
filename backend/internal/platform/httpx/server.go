@@ -15,8 +15,10 @@ import (
 
 // Server wraps Echo with platform middleware and health routes.
 type Server struct {
-	echo *echo.Echo
-	cfg  config.Server
+	echo  *echo.Echo
+	cfg   config.Server
+	live  HealthChecker
+	ready HealthChecker
 }
 
 // Dependencies required to construct the HTTP server.
@@ -51,9 +53,9 @@ func NewServer(deps Dependencies) *Server {
 		e.HTTPErrorHandler = deps.ErrorMapper.HTTPErrorHandler
 	}
 
-	s := &Server{echo: e, cfg: deps.Config}
+	s := &Server{echo: e, cfg: deps.Config, live: deps.LiveChecker, ready: deps.ReadyChecker}
 
-	s.registerHealth(deps.LiveChecker, deps.ReadyChecker)
+	s.registerHealth()
 	return s
 }
 
@@ -73,24 +75,45 @@ func (s *Server) Shutdown(ctx context.Context) error {
 	return s.echo.Shutdown(ctx)
 }
 
-func (s *Server) registerHealth(live, ready HealthChecker) {
-	s.echo.GET("/health/live", func(c echo.Context) error {
-		if live != nil {
-			if err := live.Check(c.Request().Context()); err != nil {
-				return c.JSON(http.StatusServiceUnavailable, map[string]string{"status": "unhealthy"})
-			}
-		}
-		return c.JSON(http.StatusOK, map[string]string{"status": "ok"})
-	})
+func (s *Server) registerHealth() {
+	s.echo.GET("/health/live", s.liveCheck)
+	s.echo.GET("/health/ready", s.readyCheck)
+}
 
-	s.echo.GET("/health/ready", func(c echo.Context) error {
-		if ready != nil {
-			if err := ready.Check(c.Request().Context()); err != nil {
-				return c.JSON(http.StatusServiceUnavailable, map[string]string{"status": "not_ready"})
-			}
+// liveCheck reports whether the process is alive.
+//
+//	@Summary		Liveness probe
+//	@Description	Returns 200 while the process is running; used by orchestrators to detect crashed pods.
+//	@Tags			health
+//	@Produce		json
+//	@Success		200	{object}	map[string]string	"ok"
+//	@Failure		503	{object}	map[string]string	"unhealthy"
+//	@Router			/health/live [get]
+func (s *Server) liveCheck(c echo.Context) error {
+	if s.live != nil {
+		if err := s.live.Check(c.Request().Context()); err != nil {
+			return c.JSON(http.StatusServiceUnavailable, map[string]string{"status": "unhealthy"})
 		}
-		return c.JSON(http.StatusOK, map[string]string{"status": "ready"})
-	})
+	}
+	return c.JSON(http.StatusOK, map[string]string{"status": "ok"})
+}
+
+// readyCheck reports whether the process is ready to serve traffic.
+//
+//	@Summary		Readiness probe
+//	@Description	Returns 200 only when all backing dependencies (Postgres, Redis) are reachable.
+//	@Tags			health
+//	@Produce		json
+//	@Success		200	{object}	map[string]string	"ready"
+//	@Failure		503	{object}	map[string]string	"not_ready"
+//	@Router			/health/ready [get]
+func (s *Server) readyCheck(c echo.Context) error {
+	if s.ready != nil {
+		if err := s.ready.Check(c.Request().Context()); err != nil {
+			return c.JSON(http.StatusServiceUnavailable, map[string]string{"status": "not_ready"})
+		}
+	}
+	return c.JSON(http.StatusOK, map[string]string{"status": "ready"})
 }
 
 // StaticHealthChecker always reports healthy.

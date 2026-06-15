@@ -16,3 +16,8 @@ secrets/*
 
 # Test
 coverage.out
+
+# Swagger — track docs.go (needed for build), exclude generated JSON/YAML blobs
+# Uncomment the lines below if you prefer not to commit the generated spec files.
+# docs/swagger.json
+# docs/swagger.yaml

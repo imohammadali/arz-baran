@@ -1,4 +1,4 @@
-.PHONY: help build run test tidy lint \
+.PHONY: help build run test tidy lint swagger-generate \
 	migrate-up migrate-down migrate-status migrate-version \
 	sqlc-generate sqlc-compile db-schema-sync db-check install-tools \
 	docker-setup-env docker-clean docker-up docker-down docker-logs docker-reset docker-ready docker-debug-up
@@ -29,6 +29,8 @@ POSTGRES_SSLMODE  ?= disable
 
 DATABASE_URL ?= postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)?sslmode=$(POSTGRES_SSLMODE)
 
+SWAG_VERSION    ?= v1.16.4
+
 help:
 	@echo "Application:"
 	@echo "  build              Compile API binary"
@@ -36,6 +38,7 @@ help:
 	@echo "  test               Run tests"
 	@echo "  tidy               go mod tidy"
 	@echo "  lint               go vet"
+	@echo "  swagger-generate   Regenerate docs/ from swag annotations"
 	@echo ""
 	@echo "Database (see sql/README.md):"
 	@echo "  install-tools      Install goose and sqlc CLIs"
@@ -71,6 +74,10 @@ tidy:
 
 lint:
 	$(GO) vet ./...
+
+swagger-generate:
+	$(GO) install github.com/swaggo/swag/cmd/swag@$(SWAG_VERSION)
+	swag init -g ./cmd/api/main.go -o ./docs --parseInternal
 
 install-tools:
 	$(GO) install github.com/pressly/goose/v3/cmd/goose@$(GOOSE_VERSION)

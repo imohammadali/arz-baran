@@ -23,6 +23,14 @@ func (h *Handler) Register(g *echo.Group) {
 	g.GET("/status", h.status)
 }
 
+// status returns the instrument module surface status.
+//
+//	@Summary		Instrument module status
+//	@Description	Returns the current operational status of the Instrument (assets, trading pairs) module.
+//	@Tags			instrument
+//	@Produce		json
+//	@Success		200	{object}	map[string]string
+//	@Router			/v1/instrument/status [get]
 func (h *Handler) status(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{
 		"module": "instrument",

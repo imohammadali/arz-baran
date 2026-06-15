@@ -23,6 +23,14 @@ func (h *Handler) Register(g *echo.Group) {
 	g.GET("/status", h.status)
 }
 
+// status returns the trading module surface status.
+//
+//	@Summary		Trading module status
+//	@Description	Returns the current operational status of the Trading (orders, trades) module.
+//	@Tags			trading
+//	@Produce		json
+//	@Success		200	{object}	map[string]string
+//	@Router			/v1/trading/status [get]
 func (h *Handler) status(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{
 		"module": "trading",

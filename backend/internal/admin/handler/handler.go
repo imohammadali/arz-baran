@@ -20,6 +20,14 @@ func (h *Handler) Register(g *echo.Group) {
 	g.GET("/status", h.status)
 }
 
+// status returns the admin surface status.
+//
+//	@Summary		Admin surface status
+//	@Description	Returns the current operational status of the admin management surface.
+//	@Tags			admin
+//	@Produce		json
+//	@Success		200	{object}	map[string]string
+//	@Router			/v1/admin/status [get]
 func (h *Handler) status(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{
 		"surface": "admin",

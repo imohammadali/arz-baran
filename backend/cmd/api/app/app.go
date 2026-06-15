@@ -9,7 +9,10 @@ import (
 	"syscall"
 	"time"
 
+	echoSwagger "github.com/swaggo/echo-swagger"
+
 	adminhandler "github.com/imohammadali/arz-baran/backend/internal/admin/handler"
+	_ "github.com/imohammadali/arz-baran/backend/docs" // generated Swagger spec
 	"github.com/imohammadali/arz-baran/backend/internal/module/iam"
 	"github.com/imohammadali/arz-baran/backend/internal/module/instrument"
 	"github.com/imohammadali/arz-baran/backend/internal/module/trading"
@@ -89,7 +92,7 @@ func New(ctx context.Context) (*App, error) {
 		ErrorMapper:  mapper,
 	})
 
-	registerRoutes(httpServer, modules)
+	registerRoutes(httpServer, modules, cfg)
 
 	return &App{
 		cfg:     cfg,
@@ -101,7 +104,7 @@ func New(ctx context.Context) (*App, error) {
 	}, nil
 }
 
-func registerRoutes(httpServer *httpx.Server, modules []platformmodule.Module) {
+func registerRoutes(httpServer *httpx.Server, modules []platformmodule.Module, cfg config.Config) {
 	e := httpServer.Echo()
 	v1 := e.Group("/v1")
 
@@ -110,6 +113,11 @@ func registerRoutes(httpServer *httpx.Server, modules []platformmodule.Module) {
 	}
 
 	adminhandler.New().Register(v1.Group("/admin"))
+
+	// Swagger UI is available in non-production environments only.
+	if cfg.Meta.Env != config.EnvProduction {
+		e.GET("/swagger/*", echoSwagger.WrapHandler)
+	}
 }
 
 // Run starts the HTTP server and blocks until shutdown.

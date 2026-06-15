@@ -1,0 +1,139 @@
+basePath: /
+host: localhost:8080
+info:
+  contact:
+    name: Arz Baran Engineering
+  description: Production-grade crypto and online gold exchange backend.
+  license:
+    name: Proprietary
+  title: Arz Baran Exchange API
+  version: 0.1.0
+paths:
+  /health/live:
+    get:
+      description: Returns 200 while the process is running; used by orchestrators
+        to detect crashed pods.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "503":
+          description: unhealthy
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Liveness probe
+      tags:
+      - health
+  /health/ready:
+    get:
+      description: Returns 200 only when all backing dependencies (Postgres, Redis)
+        are reachable.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ready
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "503":
+          description: not_ready
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Readiness probe
+      tags:
+      - health
+  /v1/admin/status:
+    get:
+      description: Returns the current operational status of the admin management
+        surface.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Admin surface status
+      tags:
+      - admin
+  /v1/iam/status:
+    get:
+      description: Returns the current operational status of the IAM (Identity and
+        Access Management) module.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: IAM module status
+      tags:
+      - iam
+  /v1/instrument/status:
+    get:
+      description: Returns the current operational status of the Instrument (assets,
+        trading pairs) module.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Instrument module status
+      tags:
+      - instrument
+  /v1/trading/status:
+    get:
+      description: Returns the current operational status of the Trading (orders,
+        trades) module.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Trading module status
+      tags:
+      - trading
+  /v1/wallet/status:
+    get:
+      description: Returns the current operational status of the Wallet (ledger, accounts,
+        holds) module.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Wallet module status
+      tags:
+      - wallet
+schemes:
+- http
+- https
+swagger: "2.0"

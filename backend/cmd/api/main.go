@@ -1,3 +1,16 @@
+// Package main is the entry point for the exchange API binary.
+//
+//	@title			Arz Baran Exchange API
+//	@version		0.1.0
+//	@description	Production-grade crypto and online gold exchange backend.
+//
+//	@contact.name	Arz Baran Engineering
+//
+//	@license.name	Proprietary
+//
+//	@host		localhost:8080
+//	@BasePath	/
+//	@schemes	http https
 package main
 
 import (
